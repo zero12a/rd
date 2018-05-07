@@ -63,7 +63,7 @@
 <body>
     <div id="BODY_BOX_TOP" class="BODY_BOX_TOP">
         <div class="GRP_OBJECT" style="width:30%;height:36px;font-size:20pt">
-        000시스템 
+        <?=$CFG_PROJECT_NAME?>
         </div>
         <div class="GRP_OBJECT" style="width:70%;height:18px;text-align:right">
             <a href="logout.php">Logout</a>
