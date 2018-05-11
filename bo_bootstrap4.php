@@ -21,10 +21,89 @@
         margin: -2px 0 0 10px;
         font-size: 18px;
     }
+
+    html{
+      height: calc(100vh - 110px);
+      overflow-y: visible;
+    }
+
+    body,row {
+      height: 100%;
+    }
+
+    /*
+    body {
+      height:100%;
+    }
+    */
+
     </style>
+
+    <script language=javascript>
+      function addTab(tId, tNm){
+        alert(1);
+        $("#tabsJustified").append('<li class="nav-item"><a href="" data-target="#' + tId + '" id="' + tId + '" data-toggle="tab" class="nav-link small text-uppercase">' + tNm + '</a><button class="close" type="button" onclick="closeTab(' + tId + ')">×</button></li>');      
+      }
+
+      function viewUrl(){
+        alert(22);
+        var obj = $("#home1");
+        //alert(obj);        
+        var url = $("#home1").attr("data-url");
+        alert(url);
+        if (typeof url !== "undefined") {
+          var url = $("#home1").attr("data-url");
+          var pane = $("#home1"), href = $("#home1").hash;
+
+          // ajax load from data-url
+          $("#home1Content").load(url,function(result){ 
+              alert("end load");     
+              pane.tab('show');
+          });
+        } else {
+            $("#home1").tab('show');
+        }
+
+      }
+
+      function initBody(){
+        $('#tabs').on('click','#tabsJustified a',function (e) {
+            alert(1);
+            e.preventDefault();
+            alert(2);
+            var url = $(this).attr("data-url");
+            alert(url);
+            if (typeof url !== "undefined") {
+                alert(4);
+                var pane = $(this), href = this.hash;
+
+                // ajax load from data-url
+                //$(href).load(url,function(result){ 
+                //  alert(result);     
+                //  pane.tab('show');
+                //});
+                paneID = $(e.target).attr('href');
+                alert("paneID : "+paneID);
+                src = $(paneID).attr('data-src');
+                alert("paneID : "+paneID);
+                $(paneID+" iframe").attr("src",url)
+
+            } else {
+                $(this).tab('show');
+            }
+        });
+      }
+
+
+
+      function closeTab(tId){
+        //
+        $("").remove();
+      }
+    </script>
   </head>
 
-  <body>
+  <body onload="initBody()">
     <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
       <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Company name</a>
       <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
@@ -35,8 +114,8 @@
       </ul>
     </nav>
 
-    <div class="container-fluid">
-      <div class="row">
+    <div class="container-fluid h-100" style="background-color:red;overflow:visible;">
+      <div class="row h-100" style="background-color:yellow;overflow:visible;">
         <nav class="col-md-2 d-none d-md-block bg-light sidebar">
           <div class="sidebar-sticky">
             <ul class="nav flex-column">
@@ -113,34 +192,38 @@
           </div>
         </nav>
 
-        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
-
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-2 px-3" style="background-color:green;overflow:visible">
+          
+           
+          <div id="tabs" class="h-100" style="background-color:blue;overflow:visible">
             <ul id="tabsJustified" class="nav nav-tabs">
-                <li class="nav-item"><a href="" data-target="#home1" data-toggle="tab" class="nav-link small text-uppercase">Home<button class="close" type="button">×</button></a></li>
-                <li class="nav-item"><a href="" data-target="#profile1" data-toggle="tab" class="nav-link small text-uppercase active">Profile</a></li>
+                <li class="nav-item"><a href="#home1" data-url="content.php"  data-toggle="tab" class="nav-link small text-uppercase">Home<button class="close" type="button">×</button></a></li>
+                <li class="nav-item"><a href="#profile1" data-url="login.php" data-toggle="tab" class="nav-link small text-uppercase active">Profile</a></li>
                 <li class="nav-item"><a href="" data-target="#messages1" data-toggle="tab" class="nav-link small text-uppercase">Messages</a></li>
+                <li class="nav-item"><a href="" data-url="login.php" data-toggle="tab" class="nav-link small text-uppercase">
+                login</a></li>
+            
             </ul>
             
             <br>
-            <div id="tabsJustifiedContent" class="tab-content">
+            <div id="tabsJustifiedContent" class="tab-content h-100" style="overflow:visible" >
                 <div id="home1" class="tab-pane fade">
+                  <input type=button id=a value="addTab" onclick="addTab('aaa','bbbbb')">
+                  <input type=button id=a value="viewUrl" onclick="viewUrl()">                           
                     <div class="list-group"><a href="" class="list-group-item d-inline-block"><span class="float-right badge badge-pill badge-dark">51</span> Home Link</a> <a href="" class="list-group-item d-inline-block"><span class="float-right badge badge-pill badge-dark">8</span> Link 2</a>                            <a href="" class="list-group-item d-inline-block"><span class="float-right badge badge-pill badge-dark">23</span> Link 3</a> <a href="" class="list-group-item d-inline-block text-muted">Link n..</a></div>
                 </div>
-                <div id="profile1" class="tab-pane fade active show">
-                    <div class="row pb-2">
-                        <div class="col-md-7">
-                            <p>Tabs can be used to contain a variety of content &amp; elements. They are a good way to group <a href="" class="link">relevant content</a>. Display initial content in context to the user. Enable the user to flow through
-                                <a href="" class="link">more</a> information as needed.
-                            </p>
-                        </div>
-                        <div class="col-md-5"><img src="//dummyimage.com/1005x559.png/5fa2dd/ffffff" class="float-right img-fluid img-rounded"></div>
-                    </div>
+                <div id="profile1" class="tab-pane fade active show h-100" style="background:silver;overflow:visible" >
+                  <iframe src="" style="overflow:visible" allowfullscreen="allowFullScreen" frameborder="0" width="100%" height="100%" style="background-color:gray;"></iframe>
                 </div>
                 <div id="messages1" class="tab-pane fade">
+                  <div class="align-self-stretch">Aligned flex item1</div>
+                  <div class="align-self-stretch">Aligned flex item2</div>
+                  <div class="align-self-stretch">Aligned flex item3</div>
+
                     <div class="list-group"><a href="" class="list-group-item d-inline-block"><span class="float-right badge badge-pill badge-dark">44</span> Message 1</a> <a href="" class="list-group-item d-inline-block"><span class="float-right badge badge-pill badge-dark">8</span> Message 2</a>                            <a href="" class="list-group-item d-inline-block"><span class="float-right badge badge-pill badge-dark">23</span> Message 3</a> <a href="" class="list-group-item d-inline-block text-muted">Message n..</a></div>
                 </div>
             </div>
-
+          </div>
                 
         </main>
       </div>
@@ -149,9 +232,11 @@
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script>window.jQuery || document.write('<script src="https://getbootstrap.com/docs/4.0/assets/js/vendor/jquery-slim.min.js"><\/script>')</script>
-    <script src="https://getbootstrap.com/docs/4.0/assets/js/vendor/popper.min.js"></script>
+    <script
+			  src="https://code.jquery.com/jquery-3.3.1.min.js"
+			  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+			  crossorigin="anonymous"></script>
+        
     <script src="https://getbootstrap.com/docs/4.0/dist/js/bootstrap.min.js"></script>
 
     <!-- Icons -->
@@ -160,36 +245,6 @@
       feather.replace()
     </script>
 
-    <!-- Graphs -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
-    <script>
-      var ctx = document.getElementById("myChart");
-      var myChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-          datasets: [{
-            data: [15339, 21345, 18483, 24003, 23489, 24092, 12034],
-            lineTension: 0,
-            backgroundColor: 'transparent',
-            borderColor: '#007bff',
-            borderWidth: 4,
-            pointBackgroundColor: '#007bff'
-          }]
-        },
-        options: {
-          scales: {
-            yAxes: [{
-              ticks: {
-                beginAtZero: false
-              }
-            }]
-          },
-          legend: {
-            display: false,
-          }
-        }
-      });
-    </script>
+    
   </body>
 </html>
