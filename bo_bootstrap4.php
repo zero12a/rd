@@ -33,6 +33,11 @@
       height: 100%;
     }
 
+    /*사이드바 100픽셀 고정*/
+    .my-sidebar {
+      -ms-flex: 0 0 230px;
+      flex: 0 0 230px;
+    }
     /*
     body {
       height:100%;
@@ -42,91 +47,80 @@
     </style>
 
     <script language=javascript>
-      function addTab(tId, tNm, tUrl){
-        alert("addTab = " + tId);
-        //tab
-        $("#tabsJustified").append('<li id="li_' + tId + '" class="nav-item"><a href="" data-target="#' + tId + 'Content" id="' + tId + '" data-toggle="tab" class="nav-link small text-uppercase">' + tNm + '</a><span><button class="close" type="button" onclick="closeTab(\'' + tId + '\')">×</button></span></li>');      
+
+    var lastActiveTabId = "";
+    function addTab(tId, tNm, tUrl){
+      //alert("addTab = " + tId);
+      //tab
+      //$("#tabsJustified").append('<li id="li_' + tId + '" class="nav-item"><a href="" data-target="#' + tId + 'Content" id="' + tId + '" data-toggle="tab" class="nav-link small text-uppercase">' + tNm + '<button class="close" type="button" onclick="closeTab(\'' + tId + '\')">×</button></a></li>');      
+      $("#tabsJustified").append('<li id="li_' + tId + '" class="nav-item"><a href="#' + tId + 'Content"  id="' + tId + '" data-toggle="tab" class="nav-link small text-uppercase">' + tNm + '<button class="close" type="button">×</button></a></li>');      
+    
+      lastActiveTabId = 'li_' + tId;
+
+      //tabContent
+      tStr = '<div id="' + tId + 'Content" class="tab-pane fade active show h-100" style="background:silver;overflow:visible" >';
+      tStr += '<iframe src="' + tUrl + '" style="overflow:visible" allowfullscreen="allowFullScreen" frameborder="0" width="100%" height="100%" style="background-color:gray;"></iframe>';
+      tStr += '</div>';
+      $("#tabsJustifiedContent").append(tStr);
+
+      //탭활성화 하기
+      //setTimeout(function() {
+        $("#tabsJustified > #li_" + tId + " a").tab('show');
+      //}, 1000);
+
+      //$("#tabsJustified > #li_" + tId).tab('show');
       
-        //tabContent
-        tStr = '<div id="' + tId + 'Content" class="tab-pane fade active show h-100" style="background:silver;overflow:visible" >';
-        tStr += '<iframe src="' + tUrl + '" style="overflow:visible" allowfullscreen="allowFullScreen" frameborder="0" width="100%" height="100%" style="background-color:gray;"></iframe>';
-        tStr += '</div>';
-        $("#tabsJustifiedContent").append(tStr);
+      //탭 이벤트 잡기
+      $('#tabsJustified > #li_' + tId + ' a').on('show.bs.tab', function(){
+        //alert(tId + ' shown.');
+      });
 
-        //탭활성화 하기
-        //setTimeout(function() {
-          $("#tabsJustified > #li_" + tId + " a").tab('show');
-        //}, 1000);
+    }
 
-        //$("#tabsJustified > #li_" + tId).tab('show');
-        
-        //탭 이벤트 잡기
-        $('#tabsJustified > #li_' + tId + ' a').on('show.bs.tab', function(){
-          alert(tId + ' shown.');
-        });
 
-        
-      }
+    $(document).ready(function() {
+          alert("document ready");
+            /**
+          * Remove a Tab
+          */
+          $('#tabsJustified').on('click', ' li a .close', function() {
+            alert("tabsJustified click close");
+            var tabId = $(this).parents('li').children('a').attr('href');
+            var liId = $(this).parents('li').attr('id');
+            //alert(liId);
+            $(this).parents('li').remove('li');//li 지우기
+            //alert(tabId);
+            $(tabId).remove();//컨텐츠도 지우기
+            //reNumberPages();
 
-      function viewUrl(){
-        //alert(22);
-        var obj = $("#home1");
-        //alert(obj);        
-        var url = $("#home1").attr("data-url");
-        alert(url);
-        if (typeof url !== "undefined") {
-          var url = $("#home1").attr("data-url");
-          var pane = $("#home1"), href = $("#home1").hash;
-
-          // ajax load from data-url
-          $("#home1Content").load(url,function(result){ 
-              alert("end load");     
-              pane.tab('show');
-          });
-        } else {
-            $("#home1").tab('show');
-        }
-
-      }
-
-      function initBody(){
-        $('#tabs').on('click','#tabsJustified a',function (e) {
-            alert(1);
-            e.preventDefault();
-            alert(2);
-            var url = $(this).attr("data-url");
-            alert(url);
-            if (typeof url !== "undefined") {
-                alert(4);
-                var pane = $(this), href = this.hash;
-
-                // ajax load from data-url
-                //$(href).load(url,function(result){ 
-                //  alert(result);     
-                //  pane.tab('show');
-                //});
-                paneID = $(e.target).attr('href');
-                alert("paneID : "+paneID);
-                src = $(paneID).attr('data-src');
-                alert("paneID : "+paneID);
-                $(paneID+" iframe").attr("src",url)
-
-            } else {
-                $(this).tab('show');
+            if(liId == lastActiveTabId){
+              $('#tabsJustified a:first').tab('show');
             }
-        });
-      }
+            
+          });
 
-      function closeTab(tId){
-        alert("remove : "+ tId);
-        $("#tabs #li_" + tId).remove();
-      }
+          $("#tabsJustified").on("click", "a", function(e) {
+            //alert("tabsJustified click a");          
+            if($(this)){
+              e.preventDefault();
+              lastActiveTabId = $(this).parents('li').attr('id');
+              //alert("lastActiveTabId = " + lastActiveTabId);
+              $(this).tab('show');
+            }
+
+          });
+
+    });
+
+
+
+
     </script>
   </head>
 
-  <body onload="initBody()">
+  <body >
     <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
-      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Company name</a>
+      <a class="navbar-brand col my-sidebar mr-0" href="#">Company name</a>
       <div class="w-100 bg-secondary text-right align-middle">
             <b>홍길동</b>님 어서 오세요. 최근 <b>특정 IP</b>에서 로그인 시간은 
             <b>2018.06.05 09:10:10</b>입니다.
@@ -140,17 +134,17 @@
 
     <div class="container-fluid h-100" style="background-color:red;overflow:visible;">
       <div class="row h-100" style="background-color:yellow;overflow:visible;">
-        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+        <nav class="col my-sidebar d-none d-md-block bg-light sidebar">
           <div class="sidebar-sticky">
             <ul class="nav flex-column">
               <li class="nav-item">
-                <a class="nav-link active" href="#"  onclick="addTab('aaa','bbbbb','login.php')">
+                <a class="nav-link active" href="#"  onclick="addTab('aaa','대시보드','login.php')">
                   <span data-feather="home"></span>
                   Dashboard <span class="sr-only">(current)</span>
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link" href="#" onclick="addTab('bbb','주문내역','content_v4_table.php')">
                   <span data-feather="file"></span>
                   Orders
                 </a>
@@ -181,42 +175,42 @@
               </li>
             </ul>
 
-            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted bg-dark">
               <span>Saved reports</span>
               <a class="d-flex align-items-center text-muted" href="#">
                 <span data-feather="plus-circle"></span>
               </a>
             </h6>
             <ul class="nav flex-column mb-2">
-              <li class="nav-item">
+              <li class="nav-item bg-dark">
                 <a class="nav-link" href="#">
-                  <span data-feather="file-text"></span>
-                  Current month
+                  <span data-feather="chevron-right" style="height:22px;width:22px"></span>
+                  <span class="h-100 align-top">Current month</span>
                 </a>
               </li>
-              <li class="nav-item">
+              <li class="nav-item bg-dark">
                 <a class="nav-link" href="#">
-                  <span data-feather="file-text"></span>
-                  Last quarter
+                  <span data-feather="file-text" style="height:22px;width:22px"></span>
+                  <span class="h-100 align-top">Last quarter</span>
                 </a>
               </li>
-              <li class="nav-item">
+              <li class="nav-item bg-dark">
                 <a class="nav-link" href="#">
-                  <span data-feather="file-text"></span>
-                  Social engagement
+                  <span data-feather="file-text" style="height:22px;width:22px"></span>
+                  <span class="h-100 align-top">소셜로 가자</span>
                 </a>
               </li>
-              <li class="nav-item">
+              <li class="nav-item bg-dark">
                 <a class="nav-link" href="#">
-                  <span data-feather="file-text"></span>
-                  Year-end sale
+                  <span data-feather="file-text" style="height:22px;width:22px"></span>
+                  <span class="h-100 align-top">Year-end sale</span>
                 </a>
               </li>
             </ul>
           </div>
         </nav>
 
-        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-0 pb-0 pl-0 pr-0 "
+        <main role="main" class="col pt-0 pb-0 pl-0 pr-0 "
          style="background-color:green;overflow:visible;">
           
            
