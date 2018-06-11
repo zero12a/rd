@@ -33,7 +33,7 @@
       height: 100%;
     }
 
-    /*사이드바 100픽셀 고정*/
+    /*사이드바 픽셀 고정*/
     .my-sidebar {
       -ms-flex: 0 0 230px;
       flex: 0 0 230px;
@@ -50,6 +50,13 @@
 
     var lastActiveTabId = "";
     function addTab(tId, tNm, tUrl){
+
+      //이미 탭이 존재하는거 검사하기         
+      if($("#li_" + tId).length > 0){
+        $("#tabsJustified > #li_" + tId + " a").tab('show');
+        return;
+      }
+
       //alert("addTab = " + tId);
       //tab
       //$("#tabsJustified").append('<li id="li_' + tId + '" class="nav-item"><a href="" data-target="#' + tId + 'Content" id="' + tId + '" data-toggle="tab" class="nav-link small text-uppercase">' + tNm + '<button class="close" type="button" onclick="closeTab(\'' + tId + '\')">×</button></a></li>');      
@@ -79,12 +86,12 @@
 
 
     $(document).ready(function() {
-          alert("document ready");
+          //alert("document ready");
             /**
           * Remove a Tab
           */
           $('#tabsJustified').on('click', ' li a .close', function() {
-            alert("tabsJustified click close");
+            //alert("tabsJustified click close");
             var tabId = $(this).parents('li').children('a').attr('href');
             var liId = $(this).parents('li').attr('id');
             //alert(liId);
@@ -140,31 +147,31 @@
               <li class="nav-item">
                 <a class="nav-link active" href="#"  onclick="addTab('aaa','대시보드','login.php')">
                   <span data-feather="home"></span>
-                  Dashboard <span class="sr-only">(current)</span>
+                  Login <span class="sr-only">(current)</span>
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#" onclick="addTab('bbb','주문내역','content_v4_table.php')">
+                <a class="nav-link" href="#" onclick="addTab('table1','Table1','ex1_table1.php')">
                   <span data-feather="file"></span>
-                  Orders
+                  Tabel1
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link" href="#" onclick="addTab('table2','Table2','ex2_table2.php')">
                   <span data-feather="shopping-cart"></span>
-                  Products
+                  Tabel2
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link" href="#" onclick="addTab('listgroup1','List1','ex3_listgroup1.php')">
                   <span data-feather="users"></span>
-                  Customers
+                  ListGroup1
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link" href="#" onclick="addTab('listgroup2','List2','ex4_listgroup2.php')">
                   <span data-feather="bar-chart-2"></span>
-                  Reports
+                  ListGroup2
                 </a>
               </li>
               <li class="nav-item">

@@ -2,8 +2,7 @@
 <head>
     <title>Boostrap v4.0</title>
 
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" href="./lib/bootstrap-table.min.css">
 
 
@@ -14,6 +13,16 @@
 
 
     <script src="./lib/bootstrap-table.min.js"></script>
+
+
+<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/json2/20140204/json2.min.js"></script>
+    <![endif]-->
+
 
 </head>
 <body>
@@ -26,14 +35,14 @@
     </div>
     <table id="table"
            data-toolbar="#toolbar"
-           data-search="true"
-           data-show-refresh="true"
-           data-show-toggle="true"
-           data-show-columns="true"
-           data-detail-view="true"
+           data-search="false"
+           data-show-refresh="false"
+           data-show-toggle="false"
+           data-show-columns="false"
+           data-detail-view="false"
            data-detail-formatter="detailFormatter"
            data-minimum-count-columns="2"
-           data-show-pagination-switch="true"
+           data-show-pagination-switch="false"
            data-pagination="true"
            data-id-field="id"
            data-page-list="[10, 25, 50, 100, ALL]"
@@ -49,6 +58,7 @@
         $remove = $('#remove'),
         selections = [];
     function initTable() {
+        alert("init()")
         $table.bootstrapTable({
             height: getHeight(),
             columns: [
