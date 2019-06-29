@@ -60,7 +60,7 @@
     <script src="../c.g/lib/jquery-ui-1.11.1.min.js" type="text/javascript" charset="UTF-8"></script> <!--JQUERY UI-->
     <link rel="stylesheet" href="../c.g/lib/jquery-ui-1.8.18.css" type="text/css" charset="UTF-8"><!--JQUERY UI-->
 </head>
-<body>
+<body onload="alert('top onload');">
     <div id="BODY_BOX_TOP" class="BODY_BOX_TOP">
         <div class="GRP_OBJECT" style="width:30%;height:36px;font-size:20pt">
         <?=$CFG_PROJECT_NAME?>

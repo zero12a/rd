@@ -23,7 +23,7 @@ header("Pragma:no-cache");
 	<script src="/c.g/lib/json2.min.js"></script>
 
 	<!--dhmltx-->
-    <script src="/c.g/lib/dhtmlxSuite/codebase/dhtmlx461_beautify.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/c.g/lib/dhtmlxSuite/codebase/dhtmlx.js" type="text/javascript" charset="utf-8"></script>
 
     <!--공통-->
     <script src="/c.g/rst/common.js" type="text/javascript" charset="utf-8"></script>
@@ -71,6 +71,7 @@ header("Pragma:no-cache");
 
 		myLayout.cells("b").setWidth(200);
 		myLayout.cells("b").setText("Menu");
+		myLayout.cells("b").attachURL("bo_menu.php", true);		
 		myLayout.cells("c").hideHeader();
 
 		//빈탭바 붙이기
@@ -81,13 +82,6 @@ header("Pragma:no-cache");
         myTabbar.setSkin('dhx_skyblue');
         myTabbar.enableAutoReSize(true);
 		myTabbar.enableTabCloseButton(true);
-
-
-		//트리
-		myTree = myLayout.cells("b").attachTree();
-		myTree.setImagePath("/c.g/lib/dhtmlxSuite/codebase/imgs/dhxtree_skyblue/");
-		myTree.loadXML("./menu_data.php?etc="+new Date().getTime());
-		myTree.setOnClickHandler(tonclick);
 
 
 		//메인페이지 호출
