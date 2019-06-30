@@ -279,7 +279,7 @@ header("Pragma:no-cache");
                                 and PGMTYPE in (
                                     select PGMTYPE from CMN_IP where IP = #REMOTE_ADDR#
                                 )
-                        order by mnu_ord asc
+                        order by mnu_ord asc, mnu_nm asc
                             ";
                         alog("      2  selected : " );
                     
