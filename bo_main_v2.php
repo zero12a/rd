@@ -301,7 +301,7 @@ header("Pragma:no-cache");
 
                             ?>
                             <!-- list-group-item 0-->
-                            <a id="<?=$tMenu["mnu_seq"]?>" href="#" my-url="<?=$CFG_PGM_URL_ROOT . $tMenu["url"]?>" my-nm="inbox" class="list-group-item small rounded-0"><i style="padding-left:0px;padding-top:0px;"
+                            <a id="mnu_<?=$tMenu["mnu_seq"]?>" href="#" my-url="<?=$CFG_PGM_URL_ROOT . $tMenu["url"]?>" class="list-group-item small rounded-0"><i style="padding-left:0px;padding-top:0px;"
                                 color="silver" 
                                 width="20"
                                 height="20"
