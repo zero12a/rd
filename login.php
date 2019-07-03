@@ -51,7 +51,7 @@
                     //그리드 저장 처리
                     if(data.RTN_CD == "200" && data.ERR_CD == "100"){
                         //alert("로그인이 성공했습니다.");
-                        $(location).attr('href', "bo_main.php");
+                        $(location).attr('href', "bo_main_v2.php");
                     }else{
                         alert("로그인이 실패했습니다." + data.RTN_MSG);
                     }

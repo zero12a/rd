@@ -14,6 +14,9 @@ header("Pragma:no-cache");
 	//로그인 검사
     require_once("../c.g/include/incLoginCheck.php");//로그인 검사
 
+    //세션에서 인트로URL 가져오기
+    $arrIntro = getIntroUrl();
+
     $CFG_PGM_URL_ROOT = "/c.g/CG/";
     //마지막 로그인 정보 가져오기
 
@@ -106,6 +109,9 @@ header("Pragma:no-cache");
 
     </style>
     <script>
+    function alog(tLog){
+        if(typeof console == "object")console.log(tLog);
+    }
 
     function tabClose(tmpId){
         //alert(tmpId + "-close click");
@@ -123,7 +129,22 @@ header("Pragma:no-cache");
         //alert("close 처리 완료");
 
     }
+
+    function tabOpen(id, nm, url){
+        alog("tabOpen................................start");
+        //$(this).closest('li').before('<li><a href="#contact_' + id + '">New Tab</a> <span>x</span></li>');
+        var closeTxt = '<button onclick="tabClose(\'' + id + '\');" id="' + id + '-close" type="button" class="close small" style="padding-left:10px;" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+
+        $('#myTab2').append('<li id="' + id + '-li" class="nav-item"><a class="nav-link" id="' + id + '-tab" data-toggle="tab" href="#' + id + '-content" role="tab" aria-controls="' + id + '-content" aria-selected="false">' + nm + ' ' + closeTxt + '</a></li>');
+        $('#myTabContent').append('<div class="tab-pane tab-iframe" id="' + id + '-content" role="tabpanel" aria-labelledby="' + id + '-tab"  style="background-color:green;height:inherit;"><iframe frameborder=”0″ marginwidth=”0″ marginheight=”0″ style="background-color:white;height:100%;width:100%;border-width:1px;border-color:silver;" id="' + id + '-iframe" src=""></iframe></div>');
+        
+        imestampSecond = Math.floor(+ new Date() / 1000);            
+        $("#" + id + "-iframe").attr('src', url + "?" + imestampSecond);
+        alog("tabOpen................................end");        
+    }
+
     $( document ).ready(function() {
+        alog("document.ready............................start");
 
         $("#menu a").click(function (e){
             //alert("inbox click");
@@ -137,16 +158,7 @@ header("Pragma:no-cache");
 
             //동일 ID의 탭이 없으면 생성
             if($("#" + id + "-li").attr("class") == undefined){
-                
-                //$(this).closest('li').before('<li><a href="#contact_' + id + '">New Tab</a> <span>x</span></li>');
-                var closeTxt = '<button onclick="tabClose(\'' + id + '\');" id="' + id + '-close" type="button" class="close small" style="padding-left:10px;" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
-
-                $('#myTab2').append('<li id="' + id + '-li" class="nav-item"><a class="nav-link" id="' + id + '-tab" data-toggle="tab" href="#' + id + '-content" role="tab" aria-controls="' + id + '-content" aria-selected="false">' + nm + ' ' + closeTxt + '</a></li>');
-                $('#myTabContent').append('<div class="tab-pane tab-iframe" id="' + id + '-content" role="tabpanel" aria-labelledby="' + id + '-tab"  style="background-color:green;height:inherit;"><iframe frameborder=”0″ marginwidth=”0″ marginheight=”0″ style="background-color:white;height:100%;width:100%;border-width:1px;border-color:silver;" id="' + id + '-iframe" src=""></iframe></div>');
-                
-                imestampSecond = Math.floor(+ new Date() / 1000);            
-                $("#" + id + "-iframe").attr('src', url + "?" + imestampSecond);
-                
+                tabOpen(id,nm,url);            
             }
             //탭 active
             $('#myTab2 a').removeClass('active'); //탭선택 모두 제거
@@ -179,6 +191,34 @@ header("Pragma:no-cache");
 
         //alert( "document ready!" );
         feather.replace();
+
+    //인프로 URL 열기
+    <?php
+    for($i=0;$i<sizeof($arrIntro);$i++){
+        ?>
+
+        id = "mnu_<?=$arrIntro[$i]["MNU_SEQ"]?>";
+        nm = "<?=$arrIntro[$i]["MNU_NM"]?>";
+        url = "<?=$CFG_PGM_URL_ROOT . $arrIntro[$i]["URL"]?>";
+        
+        tabOpen(id,nm,url);
+        <?php
+
+        //첫번째 탭 오픈 시키기
+        if($i == 0){
+        ?>
+            
+        //컨텐츠 active show
+        //$('#myTabContent div').removeClass('active show'); //탭선택 모두 제거       
+
+        $("#" + id + "-tab").addClass('active'); //탭 활성화    
+        $("#" + id + "-content").addClass('active show'); //탭컨텐츠 활성화             
+        <?php
+        }
+                
+    }
+    ?>
+        alog("document.ready............................end");
     });
 
     function menuToggle(){

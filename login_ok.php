@@ -224,7 +224,7 @@ function getMyGrpIntroUrl(){
     global $db,$REQ;
     $coltype = "i";
     $sql = "
-        select c.URL
+        select c.PGMID, c.MNU_SEQ, c.MNU_NM, c.URL
         from CMN_GRP_USR a
             join CMN_GRP b on a.GRP_SEQ = b.GRP_SEQ
             join CMN_MNU c on b.INTRO_PGMID = c.PGMID
@@ -240,7 +240,7 @@ function getMyGrpIntroUrl(){
 
     $tArr =  getStmtArray($stmt);
     $stmt->close();
-    return $tArr[0]["URL"];
+    return $tArr;
 }
 
 function getUserAuthArray(){
