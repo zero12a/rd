@@ -266,7 +266,7 @@ header("Pragma:no-cache");
     </div>
     <div class="fixed-top container-fluid h-100 m-0" style="padding-top:40px;z-index:1;">
         <div class="row h-100">
-            <div id="divMenu" class="col-pixel-width h-100 p-0 border-right border-dark">
+            <div id="divMenu" class="col-pixel-width h-100 p-0 border-right border-dark" style="overflow-y: auto;">
                 <div class="panel list-group" id="menu">
                 <?php
 
