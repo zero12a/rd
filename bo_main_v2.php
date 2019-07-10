@@ -250,8 +250,8 @@ header("Pragma:no-cache");
                 <a href="#" onclick="menuToggle()" >
                         <i style="padding-left:0px;padding-top:0px;"
                         color="silver" 
-                        width="20"
-                        height="20"
+                        width="24"
+                        height="24"
                         data-feather="menu"></i>
                     </a>
             </div>        
@@ -260,8 +260,8 @@ header("Pragma:no-cache");
                 <b><?=getFullDate($RecentAddDt,".",":")?></b>입니다.
                 [<a href="logout.php"><i style="padding-left:0px;padding-top:0px;"
                         color="silver" 
-                        width="20"
-                        height="20"
+                        width="24"
+                        height="24"
                         data-feather="log-out"></i></a>]
             </div>        
 
