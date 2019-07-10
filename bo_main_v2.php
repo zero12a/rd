@@ -258,7 +258,11 @@ header("Pragma:no-cache");
             <div class="d-inline float-right">
                 <b><?=getUserNm()?></b>님 어서 오세요. 최근 <b><?=$RecentRemoteAddr?></b>에서 로그인 시간은 
                 <b><?=getFullDate($RecentAddDt,".",":")?></b>입니다.
-                [<a href="logout.php">Logout</a>]
+                [<a href="logout.php"><i style="padding-left:0px;padding-top:0px;"
+                        color="silver" 
+                        width="20"
+                        height="20"
+                        data-feather="log-out"></i></a>]
             </div>        
 
 

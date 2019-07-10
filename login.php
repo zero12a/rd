@@ -10,17 +10,25 @@
     <title>rd login</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="./lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/lib/bootstrap4/css/bootstrap.min.css">
 
     <!-- Custom styles for this template -->
     <link href="./lib/bootstrap/examples/signin.css" rel="stylesheet">
 
     <!--부트스트랩 js -->
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
-	<!--dhmltx/공통-->
+    <script src="/lib/jquery/jquery-3.4.1.min.js"></script>
+    <script src="/lib/bootstrap4/js/bootstrap.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+
+
+    <!-- 아이콘-->
+    <script src="/lib/feather.min.js"></script>
+
+
+    <!--dhmltx/공통-->
+    <script src="/lib/chart.min.js" type="text/javascript" charset="UTF-8"></script> <!--Chart.js-->    
     <script src="/c.g/lib/dhtmlxSuite/codebase/dhtmlx461_beautify.js" type="text/javascript" charset="utf-8"></script>
     <script src="../c.g/common/common.js"></script>
 
@@ -64,13 +72,20 @@
 
         });//CLICK
 
+
+        //아이콘
+        feather.replace();
     });
     </script>
   </head>
 
   <body class="text-center">
     <form class="form-signin" onsubmit="return false;" method="post">
-      <img class="mb-4" src="https://getbootstrap.com/assets/brand/bootstrap-solid.svg" alt="" width="72" height="72">
+    <i style="padding-left:0px;padding-top:0px;"
+                        color="silver" 
+                        width="70"
+                        height="70"
+                        data-feather="moon"></i>
       <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
       <label for="inputEmail" class="sr-only">Email or Id</label>
       <input type="text"  name="F_EMAIL" id="F_EMAIL" class="form-control" placeholder="Email or Id" required autofocus>
