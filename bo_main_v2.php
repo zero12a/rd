@@ -98,6 +98,8 @@ header("Pragma:no-cache");
         padding:0px 0px 0px 0px;
     }
 
+
+
     /* 활성화 탭 생상 변경 */
     .nav-tabs .nav-link.active{
         background-color:silver;
