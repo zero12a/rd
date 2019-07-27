@@ -137,7 +137,7 @@ header("Pragma:no-cache");
         //$(this).closest('li').before('<li><a href="#contact_' + id + '">New Tab</a> <span>x</span></li>');
         var closeTxt = '<button onclick="tabClose(\'' + id + '\');" id="' + id + '-close" type="button" class="close small" style="padding-left:10px;" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
 
-        $('#myTab2').append('<li id="' + id + '-li" class="nav-item"><a class="nav-link" id="' + id + '-tab" data-toggle="tab" href="#' + id + '-content" role="tab" aria-controls="' + id + '-content" aria-selected="false">' + nm + ' ' + closeTxt + '</a></li>');
+        $('#myTab2').append('<li id="' + id + '-li" class="nav-item"><a class="nav-link" id="' + id + '-tab" data-toggle="tab" href="#' + id + '-content" role="tab" aria-controls="' + id + '-content" aria-selected="false"><div style="white-space:nowrap;overflow-y:hidden;">' + nm + ' ' + closeTxt + '</div></a></li>');
         $('#myTabContent').append('<div class="tab-pane tab-iframe" id="' + id + '-content" role="tabpanel" aria-labelledby="' + id + '-tab"  style="background-color:green;height:inherit;"><iframe frameborder=”0″ marginwidth=”0″ marginheight=”0″ style="background-color:white;height:100%;width:100%;border-width:1px;border-color:silver;" id="' + id + '-iframe" src=""></iframe></div>');
         
         imestampSecond = Math.floor(+ new Date() / 1000);            
@@ -243,8 +243,8 @@ header("Pragma:no-cache");
 <div id="BODY_BOX" class="BODY_BOX">
     
     <div class="row container-fluid p-0 m-0">
-        <div id="divLogo" class="col-pixel-width border-bottom border-right border-dark" style="background-color:gray;height:40px;z-index:2;padding:6px 10px 0px 10px;">
-            <div class="d-inline font-weight-bold"><?=$CFG_PROJECT_NAME?> </div>     
+        <div id="divLogo" class="col-pixel-width p-0 border-bottom border-right border-dark" style="word-break:break-all;overflow:hidden;overflow-y:hidden;background-color:gray;height:40px;z-index:2;">
+            <div class="font-weight-bold" style="margin:6px 0px 0px 10px;"><?=$CFG_PROJECT_NAME?> </div>     
         </div>
         <div class="col text-right border-bottom border-dark"
          style="font-size:9pt;background-color:gray;height:40px;z-index:2;padding:8px 20px 0px 10px;">
@@ -270,8 +270,8 @@ header("Pragma:no-cache");
 
         </div>
     </div>
-    <div class="fixed-top container-fluid h-100 m-0" style="padding-top:40px;z-index:1;">
-        <div class="row h-100">
+    <div class="row fixed-top container-fluid h-100 m-0" style="padding:40px 0px 0px 0px;z-index:1;">
+
             <div id="divMenu" class="col-pixel-width h-100 p-0 border-right border-dark overflow-auto">
                 <div class="panel list-group" id="menu">
                 <?php
@@ -374,7 +374,7 @@ header("Pragma:no-cache");
                     
                 </div>
             </div>
-        </div>
+
     </div>
 </div>
 </body>
