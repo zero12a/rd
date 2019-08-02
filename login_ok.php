@@ -6,7 +6,7 @@ header("Pragma:no-cache");
 session_start();
 
 require_once("../c.g/include/incDB.php");
-require_once("../c.g/include/incSEC.php");
+require_once("../c.g/include/incSec.php");
 require_once("../c.g/include/incUtil.php");
 require_once("../c.g/include/incUser.php");
 require_once("../c.g/include/incAuth.php");
