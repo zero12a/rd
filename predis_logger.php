@@ -21,6 +21,10 @@ Predis\Autoloader::register();
 
 echo "redis go<hr>";
 
+$objDbInfo = getDbSvrInfo("DATING");
+
+
+$logCnt = 0;
 $redisSvr = "tcp://172.17.0.1:1234?read_write_timeout=0";
 $clientPubSub = new Predis\Client($redisSvr);
 $clientAuthQ = new Predis\Client($redisSvr);
@@ -38,7 +42,7 @@ $client = new Predis\Client(
 */
 
 //var_dump($client);
-global $db;
+//global $db;
 
 
 $pubsub = $clientPubSub->pubSubLoop();
@@ -53,20 +57,25 @@ foreach ($pubsub as $message) {
         case 'message':
             echo "[message] message->channel : " . $message->channel . PHP_EOL;
             echo "[message] message->payload  : " . $message->payload  . PHP_EOL ;      
+            
+            $db = db_obj_open($objDbInfo);
 
             //수시 큐의 로그를 DB에 저장
             while($value = $clientAuthQ->lpop( 'log_auth' )){
                 
-                echo "\t" . $value . "\n";
+                echo "\t[log_auth] " . ($logCnt++) . " " . $value . "\n";
                 logUsrAuth($value);
             }
             
             //수시 큐의 로그를 DB에 저장
             while($value = $clientAuthQ->lpop( 'log_authd' )){
                 
-                echo "\t" . $value . "\n";
+                echo "\t[log_authd] " . ($logCnt++) . " "  . $value . "\n";
                 logUsrAuthD($value);
             }
+
+            $db->close();
+            if($db)unset($db);
 
             break;
         default :
@@ -77,15 +86,14 @@ foreach ($pubsub as $message) {
 
 
 
-$db->close();
 
-if($db)unset($db);
+
 
 
 
 function logUsrAuth($jsonStr){
-    
-    $db = db_obj_open(getDbSvrInfo("DATING"));
+    global $db;
+
 
     $tMap = json_decode($jsonStr,true);
     $tMap = $tMap["MAP"];
@@ -108,18 +116,21 @@ function logUsrAuth($jsonStr){
 
     if(!$stmt)JsonMsg("500","140","[logUsrAuth] SQL makeStmt 생성 실패 했습니다.");
 
-    if(!$stmt->execute())JsonMsg("500","150","[logUsrAuth] stmt 실행 실패" . $stmt->error);
+    if(!$stmt->execute())alog("[logUsrAuth] stmt 실행 실패" . $stmt->error);
             
     $RtnVal = $db->insert_id;
     $stmt->close();    
+
+
 }
 
 
 
 
 function logUsrAuthD($jsonStr){
-    
-    $db = db_obj_open(getDbSvrInfo("DATING"));
+    global $db;
+
+    //$db = db_obj_open($objDbInfo);
 
     $tMap = json_decode($jsonStr,true);
     $tMap = $tMap["MAP"];
@@ -145,10 +156,12 @@ function logUsrAuthD($jsonStr){
 
     if(!$stmt)JsonMsg("500","160","[logUsrAuthD] SQL makeStmt 생성 실패 했습니다.");
 
-    if(!$stmt->execute())JsonMsg("500","170","[logUsrAuthD] stmt 실행 실패 " . $stmt->error);
+    if(!$stmt->execute())alog("[logUsrAuthD] stmt 실행 실패 " . $stmt->error);
             
     $RtnVal = $db->insert_id;
     $stmt->close();
+
+
 }
 
 

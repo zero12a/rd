@@ -44,10 +44,10 @@ if(!isLogin()){
 }else if(!$objAuth->isOneConnection()){
 	logOut();
 	JsonMsg("500","120"," 다른기기(PC,브라우저 등)에서 로그인하였습니다. 다시로그인 후 사용해 주세요.");
-}else if($objAuth->isAuth("DEPLOYPGM",$ctl)){
-	$objAuth->LAUTH_SEQ = $objAuth->logUsrAuth($reqToken,$resToken,"DEPLOYPGM",$ctl,"Y");
+}else if($objAuth->isAuth("DEPLOYMNG",$ctl)){
+	$objAuth->LAUTH_SEQ = $objAuth->logUsrAuth($reqToken,$resToken,"DEPLOYMNG",$ctl,"Y");
 }else{
-	$objAuth->logUsrAuth($reqToken,$resToken,"DEPLOYPGM",$ctl,"N");
+	$objAuth->logUsrAuth($reqToken,$resToken,"DEPLOYMNG",$ctl,"N");
 	JsonMsg("500","120",$ctl . " 권한이 없습니다.");
 }
 		//사용자 정보 가져오기

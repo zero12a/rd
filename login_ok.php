@@ -5,13 +5,15 @@ header("Pragma:no-cache");
 
 session_start();
 
+require_once("../c.g/incConfig.php");
+
 require_once("../c.g/include/incDB.php");
 require_once("../c.g/include/incSec.php");
 require_once("../c.g/include/incUtil.php");
 require_once("../c.g/include/incUser.php");
 require_once("../c.g/include/incAuth.php");
 require_once("../c.g/include/incRequest.php");
-require_once("../c.g/incConfig.php");
+
 
 //마지막 로그인 세션id기록용
 $objAuth= new authObject();	
@@ -254,7 +256,7 @@ function getUserAuthArray(){
             join CMN_MNU c on b.PGMID = c.PGMID
         where a.USR_SEQ = #{USR_SEQ}
         and c.PGMTYPE IN (
-                select PGMTYPE from CMN_IP where IP = #{REMOTE_ADDR}
+                select PGMTYPE from CMN_IP where ALLOW_IP = #{REMOTE_ADDR} or ALLOW_IP = '0.0.0.0'
             )
         order by b.PGMID, b.AUTH_ID
     ";

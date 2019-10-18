@@ -323,7 +323,9 @@ header("Pragma:no-cache");
                                 ) d on a.PGMID = d.PGMID
                         where folder_seq = #folder_seq# 
                                 and PGMTYPE in (
-                                    select PGMTYPE from CMN_IP where IP = #REMOTE_ADDR#
+                                    select PGMTYPE from CMN_IP 
+                                    where ALLOW_IP = #REMOTE_ADDR#
+                                        or ALLOW_IP = '0.0.0.0'
                                 )
                         order by mnu_ord asc, mnu_nm asc
                             ";
