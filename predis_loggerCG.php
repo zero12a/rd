@@ -39,7 +39,7 @@ $client = new Predis\Client(
 //var_dump($client);
 global $db;
 
-$list_nm = "log_cg";
+$list_nm = "log_CG";
 while (1==1) {
 	echo "\t (loggerCG) LIST(log_cg).length = " . $clientAuthQ->llen( $list_nm ) . "\n";
 
@@ -78,18 +78,22 @@ function logToMonolog($jsonStr){
     $tMap["context.SESSIONID"]  = $tMap["context"]["SESSIONID"];
     $tMap["context.USERID"]     = $tMap["context"]["USERID"];
     $tMap["context.USERSEQ"]    = $tMap["context"]["USERSEQ"];
+    $tMap["context.REQTOKEN"]    = $tMap["context"]["REQTOKEN"];
+    $tMap["context.RESTOKEN"]    = $tMap["context"]["RESTOKEN"];
 
 
-    $coltype = "sssis ssss";
+    $coltype = "sssis sssss s";
     
     $sql = "
         insert into CG_MONOLOG (
             URL, SESSIONID, USERID, USERSEQ, LISTNM
-            , LOGLEVEL, LOGDT, LOGMSG, CHANNEL
+            , LOGLEVEL, LOGDT, LOGMSG, CHANNEL, REQTOKEN
+            , RESTOKEN
             , ADDDT
         ) values (
             #{context.URL}, #{context.SESSIONID}, #{context.USERID}, #{context.USERSEQ}, #{LISTNM}
-            , #{level_name}, #{datetime.date}, #{message}, #{channel}
+            , #{level_name}, #{datetime.date}, #{message}, #{channel}, #{context.REQTOKEN}
+            , #{context.RESTOKEN}
             ,date_format(sysdate(),'%Y%m%d%H%i%s')
         )
     ";
