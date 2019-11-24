@@ -3,9 +3,7 @@ header("Content-Type: text/html; charset=UTF-8");
 header("Cache-Control:no-cache");
 header("Pragma:no-cache");
 
-session_start();
-
-require_once("../c.g/incConfig.php");
+$CFG = include_once("../c.g/incConfig.php");
 
 require_once("../c.g/include/incDB.php");
 require_once("../c.g/include/incSec.php");
@@ -29,7 +27,7 @@ alog("REQ.F_PASSWD = ". $REQ["F_PASSWD"]);
 if($REQ["F_EMAIL"] == ""){JsonMsg("500","100","F_EMAIL 입력해 주세요.");}
 if($REQ["F_PASSWD"] == ""){JsonMsg("500","200","F_PASSWD 입력해 주세요.");}
 
-$REQ["F_PASSWD_HASH"] = pwd_hash($REQ["F_PASSWD"],$CFG_SEC_SALT);
+$REQ["F_PASSWD_HASH"] = pwd_hash($REQ["F_PASSWD"],$CFG["CFG_SEC_SALT"]);
 
 alog("REQ.F_PASSWD_HASH = ". $REQ["F_PASSWD_HASH"]);
 

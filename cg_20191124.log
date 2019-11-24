@@ -214,3 +214,4 @@
 19.11.24 21:55:14 [] ./predis_watcher     :  exec = predis_logger2.sh
 19.11.24 21:55:14 [] ./predis_watcher     : predis_loggerCG.php process not live.
 19.11.24 21:55:14 [] ./predis_watcher     :  exec = predis_loggerCG.sh
+19.11.24 22:05:07 [0ijrstbn4jvgenfdmgo9nea6nl] /r.d/bo_main_v2      : session[CG_USR_SEQ] : 

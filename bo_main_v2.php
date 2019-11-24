@@ -4,8 +4,9 @@ header("Cache-Control:no-cache");
 header("Pragma:no-cache");
 
 
+$CFG = include_once("../c.g/incConfig.php");
+
     require_once("../c.g/include/incUtil.php");
-    require_once("../c.g/incConfig.php");
     require_once("../c.g/include/incDB.php");
     require_once("../c.g/include/incUser.php");
     require_once("../c.g/include/incSec.php");    
@@ -66,7 +67,7 @@ header("Pragma:no-cache");
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?=$CFG_PROJECT_NAME?></title>
+    <title><?=$CFG["CFG_PROJECT_NAME"]?></title>
     <link rel="stylesheet" href="/lib/bootstrap4/css/bootstrap.min.css">
 
 
@@ -244,16 +245,16 @@ header("Pragma:no-cache");
     
     <div class="row container-fluid p-0 m-0">
         <div id="divLogo" class="col-pixel-width p-0 border-bottom border-right border-dark" style="word-break:break-all;overflow:hidden;overflow-y:hidden;background-color:gray;height:40px;z-index:2;">
-            <div class="font-weight-bold" style="margin:6px 0px 0px 10px;"><?=$CFG_PROJECT_NAME?> </div>     
+            <div class="font-weight-bold" style="margin:6px 0px 0px 10px;"><?=$CFG["CFG_PROJECT_NAME"]?> </div>     
         </div>
         <div class="col text-right border-bottom border-dark"
-         style="font-size:9pt;background-color:gray;height:40px;z-index:2;padding:8px 20px 0px 10px;">
+         style="font-size:9pt;background-color:gray;height:40px;z-index:2;padding:7px 20px 0px 10px;">
             <div class="d-inline float-left">
                 <a href="#" onclick="menuToggle()" >
                         <i style="padding-left:0px;padding-top:0px;"
                         color="silver" 
-                        width="24"
-                        height="24"
+                        width="26"
+                        height="26"
                         data-feather="menu"></i>
                     </a>
             </div>        
@@ -262,8 +263,8 @@ header("Pragma:no-cache");
                 <b><?=getFullDate($RecentAddDt,".",":")?></b>입니다.
                 [<a href="logout.php"><i style="padding-left:0px;padding-top:0px;"
                         color="silver" 
-                        width="24"
-                        height="24"
+                        width="26"
+                        height="26"
                         data-feather="log-out"></i></a>]
             </div>        
 
