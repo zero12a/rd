@@ -1,27 +1,28 @@
 <?php
   
-ini_set('default_socket_timeout', 0);
+//ini_set('default_socket_timeout', 0);
  
 set_time_limit(0);
 
 //subscribe.php
 //require 'Predis/Autoloader.php';
 
+$CFG = include_once(__DIR__ . "/../c.g/incConfig.php");
+
 require_once(__DIR__ . "/../c.g/include/incUtil.php");
 require_once(__DIR__ . "/../c.g/include/incSec.php");
 require_once(__DIR__ . "/../c.g/include/incDB.php");
-require_once(__DIR__ . "/../c.g/incConfig.php");
 
 
-
-require_once("./lib/predis-1.1/autoload.php");
+require_once($CFG["CFG_LIBS_PATH_REDIS"]);
 
 
 Predis\Autoloader::register();
 
 echo "redis go<hr>";
 
-$redisSvr = "tcp://172.17.0.1:1234?read_write_timeout=0";
+$redisSvr = $CFG["CFG_AUTH_REDIS"] . "?read_write_timeout=0";
+echo $redisSvr;
 $clientAuthQ = new Predis\Client($redisSvr);
 
 /*

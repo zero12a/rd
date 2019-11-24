@@ -1,39 +1,44 @@
 <?php
   
-ini_set('default_socket_timeout', 0);
+//ini_set('default_socket_timeout', 0); //이 옵션 사용시 redis 연결 에러.
  
 set_time_limit(0);
 
 //subscribe.php
 //require 'Predis/Autoloader.php';
 
-require_once(__DIR__ . "/../c.g/include/incUtil.php");
-require_once(__DIR__ . "/../c.g/include/incSec.php");
-require_once(__DIR__ . "/../c.g/include/incDB.php");
-require_once(__DIR__ . "/../c.g/incConfig.php");
-
-
-
-require_once($CFG_LIBS_PATH_REDIS);
-
-
-Predis\Autoloader::register();
-
 echo "redis go<hr>";
 
-$redisSvr = $CFG_AUTH_REDIS . "?read_write_timeout=0";
+$CFG = include_once(__DIR__ . "/../c.g/incConfig.php");
+
+//exit;
+if(!require_once(__DIR__ . "/../c.g/include/incUtil.php"))die("require incUtil fail.");
+if(!require_once(__DIR__ . "/../c.g/include/incSec.php"))die("require incSec fail.");
+if(!require_once(__DIR__ . "/../c.g/include/incDB.php"))die("require incDB fail.");
+
+//로딩 안해도 됨 기본적으로 infConfig에서 로딩함.
+//if(!require_once($CFG_LIBS_PATH_REDIS))die("require redis fail.");
+
+
+
+
+
+
+$redisSvr = $CFG["CFG_AUTH_REDIS"] . "?read_write_timeout=0";
+
+echo "###########" . $redisSvr;
+
+//Predis\Autoloader::register();
 $clientAuthQ = new Predis\Client($redisSvr);
 
 /*
-$client = new Predis\Client(
-        array(
-        'scheme'   => 'tcp',
-        'host'     => '192.168.210.1',
-        'port'     => 1234,
-        'read_write_timeout' => 0,
-        'timed_out' => false
-        )
-    );
+$redisSvr = array(
+    'scheme'   => 'tcp',
+    'host'     => '172.17.0.1',
+    'port'     => 1234,
+    'read_write_timeout' => 0,
+    'timed_out' => false
+);
 */
 
 //var_dump($client);

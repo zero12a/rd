@@ -1,16 +1,17 @@
 <?php
-if(!include_once "../c.g/incConfig.php")die("(die) incConfig not include");
+$CFG = include_once("../c.g/incConfig.php");
+
 if(!include_once "../c.g/include/incUtil.php")die("(die) incUtil not include");
 
 //search nm, execute sh
 $watcherTarget = array(
 	array(
 			"SEARCH_NM"=>"predis_logger2.php"
-			,"EXECUTE_SH"=> $CFG_DEPLOY_DIR . "predis_logger2.sh"
+			,"EXECUTE_SH"=> $CFG["CFG_DEPLOY_DIR"] . "predis_logger2.sh"
 		)
 	,array(
 			"SEARCH_NM"=>"predis_loggerCG.php"
-			,"EXECUTE_SH"=> $CFG_DEPLOY_DIR . "predis_loggerCG.sh"
+			,"EXECUTE_SH"=> $CFG["CFG_DEPLOY_DIR"] . "predis_loggerCG.sh"
 	)		
 );
 
