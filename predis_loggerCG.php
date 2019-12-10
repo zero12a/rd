@@ -12,9 +12,9 @@ echo "redis go<hr>";
 $CFG = include_once(__DIR__ . "/../c.g/incConfig.php");
 
 //exit;
-if(!require_once(__DIR__ . "/../c.g/include/incUtil.php"))die("require incUtil fail.");
-if(!require_once(__DIR__ . "/../c.g/include/incSec.php"))die("require incSec fail.");
-if(!require_once(__DIR__ . "/../c.g/include/incDB.php"))die("require incDB fail.");
+if(!require_once(__DIR__ . "/../common/include/incUtil.php"))die("require incUtil fail.");
+if(!require_once(__DIR__ . "/../common/include/incSec.php"))die("require incSec fail.");
+if(!require_once(__DIR__ . "/../common/include/incDB.php"))die("require incDB fail.");
 
 //로딩 안해도 됨 기본적으로 infConfig에서 로딩함.
 //if(!require_once($CFG_LIBS_PATH_REDIS))die("require redis fail.");

@@ -9,9 +9,9 @@ set_time_limit(0);
 
 $CFG = include_once(__DIR__ . "/../c.g/incConfig.php");
 
-require_once(__DIR__ . "/../c.g/include/incUtil.php");
-require_once(__DIR__ . "/../c.g/include/incSec.php");
-require_once(__DIR__ . "/../c.g/include/incDB.php");
+require_once(__DIR__ . "/../common/include/incUtil.php");
+require_once(__DIR__ . "/../common/include/incSec.php");
+require_once(__DIR__ . "/../common/include/incDB.php");
 
 
 require_once($CFG["CFG_LIBS_PATH_REDIS"]);
