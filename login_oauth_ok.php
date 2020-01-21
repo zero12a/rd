@@ -12,24 +12,61 @@ require_once("../common/include/incUser.php");
 require_once("../common/include/incAuth.php");
 require_once("../common/include/incRequest.php");
 
+//guzzle clint를 통해 access_token에 대한 resource 정보 가져오기
+require_once "../lib/php/vendor/autoload.php";
+
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\GuzzleException;
 
 //마지막 로그인 세션id기록용
 $objAuth= new authObject();	
 
 //외부 파라미터 받기
-$REQ["F_EMAIL"] = reqPostString("F_EMAIL",100);
-$REQ["F_PASSWD"] = reqPostString("F_PASSWD",30);
+$REQ["access_token"] = reqPostString("access_token",100);
+$REQ["refresh_token"] = reqPostString("refresh_token",100);
 
 
-alog("REQ.F_EMAIL = ". $REQ["F_EMAIL"]);
-alog("REQ.F_PASSWD = ". $REQ["F_PASSWD"]);
+alog("REQ.access_token = ". $REQ["access_token"]);
+alog("REQ.refresh_token = ". $REQ["refresh_token"]);
 
-if($REQ["F_EMAIL"] == ""){JsonMsg("500","100","F_EMAIL 입력해 주세요.");}
-if($REQ["F_PASSWD"] == ""){JsonMsg("500","200","F_PASSWD 입력해 주세요.");}
+if($REQ["access_token"] == ""){JsonMsg("500","100","access_token 입력해 주세요.");}
+if($REQ["refresh_token"] == ""){JsonMsg("500","200","refresh_token 입력해 주세요.");}
 
-$REQ["F_PASSWD_HASH"] = pwd_hash($REQ["F_PASSWD"],$CFG["CFG_SEC_SALT"]);
 
-alog("REQ.F_PASSWD_HASH = ". $REQ["F_PASSWD_HASH"]);
+//exit;
+
+// Create a client with a base URI
+$client = new GuzzleHttp\Client();
+// Send a request to https://foo.com/api/test
+//     'body' => 'grant_type=password&client_id=demoapp&client_secret=demopass&username=demouser&password=testpass'
+
+try{
+    $res = $client->request('GET', 'http://172.17.0.1:8052/getResource/', [
+        'timeout' => 1,
+        'connect_timeout' => 1,
+        'read_timeout' => 2,
+        'query' => [
+            'access_token' => $REQ["access_token"]
+        ]
+    ]);
+    
+    echo "<hr>" . $res->getStatusCode();
+    // "200"
+    echo "<hr>" . $res->getHeader('content-type')[0];
+    // 'application/json; charset=utf8'
+    echo "<hr>" . $res->getBody();
+
+}catch(ClientException $e) {
+    echo $e->getMessage() . "\n";
+    echo $e->getRequest()->getMethod();
+}catch(GuzzleException $e) {
+    echo $e->getMessage() . "\n";
+    echo $e->getRequest()->getMethod();
+}
+
+exit;
 
 //DB연결 정보 생성
 $db = db_obj_open(getDbSvrInfo("DATING"));

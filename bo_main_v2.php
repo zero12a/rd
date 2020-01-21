@@ -4,16 +4,16 @@ header("Cache-Control:no-cache");
 header("Pragma:no-cache");
 
 
-$CFG = include_once("../c.g/incConfig.php");
+$CFG = require_once("../common/include/incConfig.php");
 
-    require_once("../c.g/include/incUtil.php");
-    require_once("../c.g/include/incDB.php");
-    require_once("../c.g/include/incUser.php");
-    require_once("../c.g/include/incSec.php");    
-    require_once("../c.g/include/incRequest.php");
+require_once("../common/include/incUtil.php");
+require_once("../common/include/incDB.php");
+require_once("../common/include/incUser.php");
+require_once("../common/include/incSec.php");    
+require_once("../common/include/incRequest.php");
 
-	//로그인 검사
-    require_once("../c.g/include/incLoginCheck.php");//로그인 검사
+//로그인 검사
+require_once("../common/include/incLoginCheck.php");//로그인 검사
 
     //세션에서 인트로URL 가져오기
     $arrIntro = getIntroUrl();
@@ -68,14 +68,14 @@ $CFG = include_once("../c.g/incConfig.php");
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?=$CFG["CFG_PROJECT_NAME"]?></title>
-    <link rel="stylesheet" href="/lib/bootstrap4/css/bootstrap.min.css">
+    <link rel="stylesheet" href="<?=$CFG["CFG_URL_LIBS_ROOT"]?>lib/bootstrap4/css/bootstrap.min.css">
 
 
-    <script src="/lib/bootstrap4/jquery-3.4.1.slim.min.js"></script>
-    <script src="/lib/bootstrap4/js/bootstrap.min.js"></script>
+    <script src="<?=$CFG["CFG_URL_LIBS_ROOT"]?>lib/jquery/jquery-3.4.1.slim.min.js"></script>
+    <script src="<?=$CFG["CFG_URL_LIBS_ROOT"]?>lib/bootstrap4/js/bootstrap.min.js"></script>
 
     <!-- 아이콘-->
-    <script src="/lib/feather.min.js"></script>
+    <script src="<?=$CFG["CFG_URL_LIBS_ROOT"]?>lib/feather.min.js"></script>
 
     <style>
     

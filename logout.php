@@ -6,7 +6,7 @@ header("Pragma:no-cache");
 
 session_start();
 
-require_once("../c.g/include/incUser.php");
+require_once("../common/include/incUser.php");
 
 
 logOut();
