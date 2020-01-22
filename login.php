@@ -20,7 +20,8 @@ $CFG = require_once("../common/include/incConfig.php");
     <script src="<?=$CFG["CFG_URL_LIBS_ROOT"]?>lib/jquery/jquery-3.4.1.min.js"></script>
     <script src="<?=$CFG["CFG_URL_LIBS_ROOT"]?>lib/bootstrap4/js/bootstrap.min.js"></script>
 
-   
+    <!--uuid-->
+    <script src="<?=$CFG["CFG_URL_LIBS_ROOT"]?>lib/uuidv4.js"></script>
 
     <!-- 아이콘-->
     <script src="<?=$CFG["CFG_URL_LIBS_ROOT"]?>lib/feather.min.js"></script>
@@ -38,6 +39,8 @@ $CFG = require_once("../common/include/incConfig.php");
 
     $( document ).ready( function() {
         //alog("페이지 준비 완료1");
+
+        var reqtoken = uuidv4();
 
         $( "#btnLogin" ).click(function() {
             //alert( "Login go." + $("#F_EMAIL").val()  );
@@ -100,10 +103,7 @@ $CFG = require_once("../common/include/incConfig.php");
     </form>
 
 
-    <script src="http://wzrd.in/standalone/uuid%2Fv4@latest"></script>
-    <script>
-    //alert(uuidv4()); // -> v4 UUID
-    </script> 
+
 
 
 

@@ -17,7 +17,7 @@ $CFG = require_once("../common/include/incConfig.php");
     <script src="<?=$CFG["CFG_URL_LIBS_ROOT"]?>lib/jquery/jquery-3.4.1.min.js"></script>
     <script src="<?=$CFG["CFG_URL_LIBS_ROOT"]?>lib/bootstrap4/js/bootstrap.min.js"></script>
 
-   
+    <script src="<?=$CFG["CFG_URL_LIBS_ROOT"]?>lib/uuidv4.js"></script>
 
     <!-- 아이콘-->
     <script src="<?=$CFG["CFG_URL_LIBS_ROOT"]?>lib/feather.min.js"></script>
@@ -37,16 +37,22 @@ $CFG = require_once("../common/include/incConfig.php");
     var client_id = "demoapp";
     var client_secret = "demopass";
 
+
+
+
     $( document ).ready( function() {
         //alog("페이지 준비 완료1");
 
         $( "#btnLogin" ).click(function() {
             //alert( "Login go." + $("#F_EMAIL").val()  );
 
+            var req_token = uuidv4();
+            //alert(req_token);
+
             //서버에서 DD가져오기
             $.ajax({
                 type : "POST",
-                url : login_url,
+                url : login_url + "req_token=" + req_token,
                 data : { "client_id" : client_id, "client_secret" : client_secret, "username" :  $("#F_EMAIL").val() , "password" :  $("#F_PASSWD").val()  },
                 dataType: "json",
                 success: function(data){
@@ -63,6 +69,8 @@ $CFG = require_once("../common/include/incConfig.php");
 
                         $("#access_token").val(data.RTN_DATA.access_token);
                         $("#refresh_token").val(data.RTN_DATA.refresh_token);
+
+                        $("#redirectForm").attr("action", "login_oauth_ok.php?req_token=" + req_token);
                         $("#redirectForm").first().submit();
                     }else{
                         alert("로그인이 실패했습니다." + data.RTN_MSG);
@@ -105,12 +113,9 @@ $CFG = require_once("../common/include/incConfig.php");
     </form>
 
 
-    <script src="<?=$CFG["CFG_URL_LIBS_ROOT"]?>lib/uuidv4.js"></script>
-    <script>
-    //alert(uuidv4()); // -> v4 UUID
-    </script> 
 
-<form method=post id="redirectForm" action="login_oauth_ok.php">
+
+<form method=post id="redirectForm" action="">
 <input type="hidden" name="access_token" id="access_token" value="">
 <input type="hidden" name="refresh_token" id="refresh_token" value="">
 </form>
