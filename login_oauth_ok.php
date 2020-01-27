@@ -111,8 +111,23 @@ setIntroUrl($introUrl);
 setAccessToken($REQ["access_token"]);
 setRefreshToken($REQ["refresh_token"]);
 
+//log 기록
+$REQ["SUCCESS_YN"] = "Y";
+$REQ["REMOTE_ADDR"] = $_SERVER["REMOTE_ADDR"]; 
+$REQ["SERVER_NAME"] = $_SERVER["SERVER_NAME"]; 
+$REQ["USER_AGENT"] = $_SERVER["HTTP_USER_AGENT"]; 
+$REQ["SESSION_ID"] = session_id(); 
+$REQ["AUTH_JSON"] = json_encode($resArr["RTN_DATA"]["AUTH_INFO"]);
+$REQ["RESPONSE_MSG"] = "ID EXIST, NO LOCK, PW EQUAL.";
+/*
+#{USR_ID}, #{SESSION_ID}, #{SUCCESS_YN}, #{RESPONSE_MSG}, #{LOCKCD}
+, #{PW_ERR_CNT}, #{LOCK_LIMIT_DT},#{USR_SEQ}, #{SERVER_NAME}, #{REMOTE_ADDR}
+, #{USER_AGENT}, #{AUTH_JSON}
+*/
+$LoginSeq = saveLoginLog($REQ);
 
-//setLoginSeq($LoginSeq);     
+//마지막 로그인로그 기록
+setLoginSeq($LoginSeq);     
 
 //객체 해제
 $db->close();unset($objAuth);
