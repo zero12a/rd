@@ -68,6 +68,7 @@ try{
 
     $resJsonStr = $res->getBody();
     $resArr = json_decode($resJsonStr,true);//true : stdclass가 아닌 그냥 배열로
+    //var_dump($resArr);
 
 }catch(ClientException $e) {
     alog("ClientException : " . $e->getMessage());
@@ -80,10 +81,10 @@ try{
 }
 
 
-
-
 //사용자 정보 세팅
-$REQ["USR_SEQ"] = $resArr["RTN_DATA"]["USER_INFO"]["user_seq"];
+$REQ["USR_SEQ"] = $resArr["RTN_DATA"]["USER_INFO"]["USR_SEQ"];
+$REQ["USR_ID"] = $resArr["RTN_DATA"]["USER_INFO"]["USR_ID"];
+$REQ["USR_NM"] = $resArr["RTN_DATA"]["USER_INFO"]["USR_NM"];
 
 
 //마지막 로그인세션 기록용(중복로그인 방지)
@@ -100,10 +101,17 @@ $db = db_obj_open(getDbSvrInfo("DATING"));
 $introUrl = getMyGrpIntroUrl();
 
 //세션부여
+//var_dump($REQ);
 setUserSeq($REQ["USR_SEQ"]);
 setUserId($REQ["USR_ID"]);
 setUserNm($REQ["USR_NM"]);     
-setIntroUrl($introUrl);             
+setIntroUrl($introUrl);       
+
+//oauth
+setAccessToken($REQ["access_token"]);
+setRefreshToken($REQ["refresh_token"]);
+
+
 //setLoginSeq($LoginSeq);     
 
 //객체 해제
