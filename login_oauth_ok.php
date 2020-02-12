@@ -95,7 +95,7 @@ $objAuth->setUserAuth($resArr["RTN_DATA"]["AUTH_INFO"]);
 
 
 //DB연결 정보 생성
-$db = db_obj_open(getDbSvrInfo("DATING"));
+$db = getDbConn($CFG["CFG_DB"]["DATING"]);
 
 //인트로 URL가져오기
 $introUrl = getMyGrpIntroUrl();
