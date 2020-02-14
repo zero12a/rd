@@ -34,8 +34,8 @@ $CFG = require_once("../common/include/incConfig.php");
     var login_url = "http://localhost:8052/newToken/?";
 
     //post param nm : client_id, client_secret, username, password
-    var client_id = "demoapp";
-    var client_secret = "demopass";
+    var client_id = "svcfront";
+    var client_secret = "frontoffice";
 
 
 
@@ -67,10 +67,11 @@ $CFG = require_once("../common/include/incConfig.php");
                         //alert("로그인이 성공했습니다.");
                         //$(location).attr('href', "bo_main_v2.php");
 
+                        $("#client_id").val(client_id);
                         $("#access_token").val(data.RTN_DATA.access_token);
                         $("#refresh_token").val(data.RTN_DATA.refresh_token);
 
-                        $("#redirectForm").attr("action", "login_oauth_ok.php?req_token=" + req_token);
+                        $("#redirectForm").attr("action", data.RTN_DATA.redirect_uri + "?req_token=" + req_token);
                         $("#redirectForm").first().submit();
                     }else{
                         alert("로그인이 실패했습니다." + data.RTN_MSG);
@@ -116,6 +117,7 @@ $CFG = require_once("../common/include/incConfig.php");
 
 
 <form method=post id="redirectForm" action="">
+<input type="hidden" name="client_id" id="client_id" value="">
 <input type="hidden" name="access_token" id="access_token" value="">
 <input type="hidden" name="refresh_token" id="refresh_token" value="">
 </form>

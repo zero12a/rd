@@ -22,7 +22,7 @@ require_once("../common/include/incLoginCheck.php");//로그인 검사
     //마지막 로그인 정보 가져오기
 
     //DB에서 마지막 로그인 정보 가져오기
-    $db = getDbConn($CFG["CFG_DB"]["DATING"]);
+    $db = getDbConn($CFG["CFG_DB"]["OS"]);
 
     $coltype = "ss";
     $sql = "
