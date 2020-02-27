@@ -1,28 +1,42 @@
 <?php
-//PGMID : DEPLOYPGM
-//PGMNM : 배포관리자
+//PGMID : APPAPI
+//PGMNM : 앱API
 header("Content-Type: text/html; charset=UTF-8"); //HTML
 
-require_once("../c.g/include/incUtil.php");
-include_once('../c.g/include/incRequest.php');//CG REQUEST
+//설정 함수 읽기
+$CFG = require_once '../common/include/incConfig.php';
+
+//default lib Autoload
+require_once($CFG["CFG_LIBS_VENDOR"]);
+
+//LIBS
+require_once('../common/include/incUtil.php');//CG UTIL
+require_once('../common/include/incRequest.php');//CG REQUEST
+require_once('../common/include/incDB.php');//CG DB
+require_once('../common/include/incSec.php');//CG SEC
+require_once('../common/include/incAuth.php');//CG AUTH
+require_once('../common/include/incUser.php');//CG USER
+
+//인증 게이트웨이
+require_once('../common/include/incLoginOauthGateway.php');//CG USER
 ?><!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>	
 <title>배포관리자</title>
 <meta http-equiv="Context-Type" context="text/html;charset=UTF-8" />
 <!--CSS/JS 불러오기-->
-<script src="../c.g/lib/jquery-1.11.1.min.js" type="text/javascript" charset="UTF-8"></script> <!--JQUERY CORE-->
-<script src="../c.g/lib/jquery-ui-1.11.1.min.js" type="text/javascript" charset="UTF-8"></script> <!--JQUERY UI-->
-<script src="../c.g/lib/json2.min.js" type="text/javascript" charset="UTF-8"></script> <!--JQUERY JSON-->
-<script src="../c.g/lib/dhtmlxSuite/codebase/dhtmlx.js" type="text/javascript" charset="UTF-8"></script> <!--DHTMLX CORE-->
-<script src="/lib/chart.min.js" type="text/javascript" charset="UTF-8"></script> <!--Chart.js-->
-<script src="/chartjs_util.js" type="text/javascript" charset="UTF-8"></script> <!--Chart.js-->
-<script src="../c.g/common/common.js" type="text/javascript" charset="UTF-8"></script> <!--DHTMLX EXT-->
-<script src="/lib/moment.min.js" type="text/javascript" charset="UTF-8"></script> <!--Moment Date-->
-<link rel="stylesheet" href="../c.g/lib/dhtmlxSuite/codebase/dhtmlx.css" type="text/css" charset="UTF-8"><!--DHTMLX CORE-->
-<link rel="stylesheet" href="../c.g/lib/jquery-ui-1.8.18.css" type="text/css" charset="UTF-8"><!--JQUERY UI-->
+<script src="<?=$CFG["CFG_URL_LIBS_ROOT"]?>lib/jquery/jquery-1.12.4.min.js" type="text/javascript" charset="UTF-8"></script> <!--JQUERY CORE-->
+<script src="<?=$CFG["CFG_URL_LIBS_ROOT"]?>lib/jquery/jquery-ui.min.js" type="text/javascript" charset="UTF-8"></script> <!--JQUERY UI-->
+<script src="<?=$CFG["CFG_URL_LIBS_ROOT"]?>lib/json2.min.js" type="text/javascript" charset="UTF-8"></script> <!--JQUERY JSON-->
+<script src="<?=$CFG["CFG_URL_LIBS_ROOT"]?>lib/dhtmlxSuite/codebase/dhtmlx.js" type="text/javascript" charset="UTF-8"></script> <!--DHTMLX CORE-->
+<script src="<?=$CFG["CFG_URL_LIBS_ROOT"]?>lib/Chart.min.js" type="text/javascript" charset="UTF-8"></script> <!--Chart.js-->
+<script src="/common/chartjs_util.js" type="text/javascript" charset="UTF-8"></script> <!--Chart.js-->
+<script src="/common/common.js" type="text/javascript" charset="UTF-8"></script> <!--DHTMLX EXT-->
+<script src="<?=$CFG["CFG_URL_LIBS_ROOT"]?>/lib/moment.min.js" type="text/javascript" charset="UTF-8"></script> <!--Moment Date-->
+<link rel="stylesheet" href="<?=$CFG["CFG_URL_LIBS_ROOT"]?>lib/dhtmlxSuite/codebase/dhtmlx.css" type="text/css" charset="UTF-8"><!--DHTMLX CORE-->
+<link rel="stylesheet" href="<?=$CFG["CFG_URL_LIBS_ROOT"]?>lib/jquery/jquery-ui.min.css" type="text/css" charset="UTF-8"><!--JQUERY UI-->
 <script src="deploypgm.js?<?=getRndVal(10)?>"></script>
-<link href="../c.g/common/common.css" rel="stylesheet" type="text/css" />
+<link href="/common/common.css" rel="stylesheet" type="text/css" />
 <script>
 	//팝업창인 경우 오프너에게서 파라미터 받기
     var grpId = "<?=getFilter(reqPostString("GRPID",20),"SAFEECHO","")?>";
@@ -40,8 +54,8 @@ include_once('../c.g/include/incRequest.php');//CG REQUEST
 			<div class="DETAIL_LABELGRP">
 			<div class="DETAIL_LABEL"  style="">
 				<b>* 배포관리자</b>	
-				<!--popup--><a href="?" target="_blank"><img src="/c.g/img/popup.png" height=10 align=absmiddle border=0></a>
-				<!--reload--><a href="javascript:location.reload();"><img src="/c.g/img/reload.png" width=11 height=10 align=absmiddle border=0></a>
+					<!--popup--><a href="?" target="_blank"><img src="<?=$CFG["CFG_URL_LIBS_ROOT"]?>img/popup.png" height=10 align=absmiddle border=0></a>
+				<!--reload--><a href="javascript:location.reload();"><img src="<?=$CFG["CFG_URL_LIBS_ROOT"]?>img/reload.png" width=11 height=10 align=absmiddle border=0></a>
 			</div>	
 			<div class="DETAIL_LABELBTN">				<input type="button" name="BTN_G1_SEARCHALL" value="조회(전체)" onclick="G1_SEARCHALL(uuidv4());">
 				<input type="button" name="BTN_G1_SAVE" value="저장" onclick="G1_SAVE(uuidv4());">
