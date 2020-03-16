@@ -6,6 +6,8 @@ header("Pragma:no-cache");
 
 $CFG = require_once("../common/include/incConfig.php");
 
+require_once($CFG["CFG_LIBS_VENDOR"]);
+
 require_once("../common/include/incUtil.php");
 require_once("../common/include/incDB.php");
 require_once("../common/include/incUser.php");
@@ -15,10 +17,24 @@ require_once("../common/include/incRequest.php");
 //로그인 검사
 require_once("../common/include/incLoginCheck.php");//로그인 검사
 
+//로거
+$reqToken = reqGetString("TOKEN",37);
+$resToken = uniqid();
+$log = getLogger(
+    array(
+    "LIST_NM"=>"log_CG"
+    , "PGM_ID"=>"BO_MAIN_V2"
+    , "REQTOKEN" => $reqToken
+    , "RESTOKEN" => $resToken
+    , "LOG_LEVEL" => Monolog\Logger::DEBUG
+    )
+);
+
+
     //세션에서 인트로URL 가져오기
     $arrIntro = getIntroUrl();
 
-    $CFG_PGM_URL_ROOT = "/c.g/CG/";
+    $CFG_PGM_URL_ROOT = "/d.s/CG/";
     //마지막 로그인 정보 가져오기
 
     //DB에서 마지막 로그인 정보 가져오기
