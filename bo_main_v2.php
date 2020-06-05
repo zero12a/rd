@@ -293,22 +293,19 @@ $log = getLogger(
                 <div class="panel list-group" id="menu">
                 <?php
 
+                $coltype = "";
+                $sql = "select folder_seq,folder_nm from CMN_FOLDER where use_yn='Y' order by folder_ord asc";
+                $stmt = makeStmt($db,$sql,$coltype,$REQ);
+                    
+                if(!$stmt)JsonMsg("500","300","SQL makeStmt 실패 했습니다.");
 
-                //folder 가져오기
-                $to_coltype = "";
-                alog("       1 to_coltype : " . $to_coltype);
-                $sql = "
-                select folder_seq,folder_nm from CMN_FOLDER where use_yn='Y' order by folder_ord asc
-                    ";
-                alog("       1 selected : " );
+                if(!$stmt->execute())JsonMsg("500","100","stmt 실행 실패" . $db->errno . " -> " . $db->error);
 
-                $REQ = null;
-                $stmt = make_stmt($db,$sql, $to_coltype, $REQ);
-                if(!$stmt)   JsonMsg("500","108","stmt 생성 실패" . $db->errno . " -> " . $db->error);
-                //var_dump( make_grid_read_array($stmt) );
 
-                $tResultArrayFolder = make_grid_read_array($stmt);
-                foreach($tResultArrayFolder->RTN_DATA->data as $tFolder) {
+                $tArr =  getStmtArray($stmt);
+                $stmt->close();
+
+                foreach($tArr as $tFolder) {
 
                     //echo '  <item   text="' . $tFolder["folder_nm"] . '" id="' . $tFolder["folder_seq"] . '" open="1">' . PHP_EOL;
 
@@ -358,10 +355,15 @@ $log = getLogger(
                         //var_dump( make_grid_read_array($stmt) );
                     
                         alog("      3  selected : " );
-                        $tResultArrayMenu = make_grid_read_array($stmt);
+                        //$tResultArrayMenu = make_grid_read_array($stmt);
+
+
+                        $tArrMenu =  getStmtArray($stmt);
+                        $stmt->close();
+
                         //var_dump($tResultArrayMenu);
                         alog("      3  selected : " );
-                        foreach($tResultArrayMenu->RTN_DATA->data as $tMenu) {
+                        foreach($tArrMenu as $tMenu) {
                             //echo '      <item text="' . $tMenu["mnu_nm"] . '" id="' . $tMenu["mnu_seq"] . ":" .$CFG_PGM_URL_ROOT . $tMenu["url"] . '"></item>' . PHP_EOL;
 
                             ?>
