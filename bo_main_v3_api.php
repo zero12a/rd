@@ -36,12 +36,19 @@ if($CTL == "getMenu"){
     $db = getDbConn($CFG["CFG_DB"]["OS"]);
     $sql = "select 
         mnu1_seq as mnu1_seq
-        , mnu_id as id
-        , mnu_nm as nm
-        , mnu_url as url
+        , m1.FOLDER_YN
+        , m1.PGMID as id
+        , case when m1.FOLDER_YN = 'Y' then 
+                m1.FOLDER_NM
+            else
+                m.mnu_nm
+            end
+            as nm
+        , m.url as url
         , mnu_icon as icon
-        from CMN_MNU1 
-        order by MNU_ORD asc
+        from CMN_MNU1 m1
+            left outer join CMN_MNU m on m1.PGMID = m.PGMID
+        order by m1.MNU_ORD asc
         ";
     
     $sqlMap = getSqlParam($sql,$coltype="",$REQ);
@@ -51,33 +58,40 @@ if($CTL == "getMenu"){
 
 
     for($i=0;$i<count($mnu1Info);$i++){
-        //echo $i . PHP_EOL;
-        $sql = "select 
-        mnu2_seq as mnu2_seq
-        , mnu_id as id
-        , mnu_nm as nm
-        , mnu_url as url
-        , mnu_icon as icon
-        from CMN_MNU2
-        where MNU1_SEQ = #{MNU1_SEQ} 
-        order by MNU_ORD asc
-        ";
-    
-        $REQ = array();
-        alog("mnu1_seq = " . $mnu1Info[$i]["mnu1_seq"]);
-        $REQ["MNU1_SEQ"] = $mnu1Info[$i]["mnu1_seq"];
+        if($mnu1Info[$i]["FOLDER_YN"] == "Y"){
+            //echo $i . PHP_EOL;
+            $sql = "select 
+            mnu2_seq as mnu2_seq
+            , m2.PGMID as id
+            , m.mnu_nm as nm
+            , m.url as url
+            , mnu_icon as icon
+            from CMN_MNU2 m2
+                left outer join CMN_MNU m on m2.PGMID = m.PGMID
+            where MNU1_SEQ = #{MNU1_SEQ} 
+            order by m2.MNU_ORD asc
+            ";
 
-        $sqlMap = getSqlParam($sql,$coltype="i",$REQ);
-        $stmt = getStmt($db,$sqlMap);
-        $mnu2Info = getStmtArray($stmt);
-        closeStmt($stmt);
-        if(sizeof($mnu2Info) > 0){
-            $mnu1Info[$i]["submenus"] = $mnu2Info;
-            //$mnu1Info[$i]["submenu_cnt"] = sizeof($mnu2Info);
+            $REQ = array();
+            alog("mnu1_seq = " . $mnu1Info[$i]["mnu1_seq"]);
+            $REQ["MNU1_SEQ"] = $mnu1Info[$i]["mnu1_seq"];
+
+            $sqlMap = getSqlParam($sql,$coltype="i",$REQ);
+            $stmt = getStmt($db,$sqlMap);
+            $mnu2Info = getStmtArray($stmt);
+            closeStmt($stmt);
+            if(sizeof($mnu2Info) > 0){
+                $mnu1Info[$i]["submenus"] = $mnu2Info;
+                //$mnu1Info[$i]["submenu_cnt"] = sizeof($mnu2Info);
+            }else{
+                $mnu1Info[$i]["submenus"] = array();
+                //$mnu1Info[$i]["submenu_cnt"] = "0";
+            }
         }else{
             $mnu1Info[$i]["submenus"] = array();
             //$mnu1Info[$i]["submenu_cnt"] = "0";
         }
+     
 
     }
 

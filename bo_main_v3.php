@@ -158,7 +158,8 @@ new Vue({
         active_tab : null, //0, 1, 2, 3 ~ 숫자 인덱스 순서임
         mytab : [],
         myMenu : [],
-        dark_theme : false
+        dark_theme : false,
+        CFG_RD_URL_MNU_ROOT : '<?=$CFG["CFG_RD_URL_MNU_ROOT"]?>'
     }),
 
     created () {
@@ -197,8 +198,11 @@ new Vue({
 
             //alert(tmp);
         },          
-        addTab: function(tId,tNm,tUrl){
+        addTab: function(tId,tNm,tUrl2){
             alog("addTab().........................start");
+
+            var tUrl = this.CFG_RD_URL_MNU_ROOT + tUrl2;
+
             tJson = {id:tId,name:tNm,link:tUrl,isdisplay:""};
 
             //이미 추가된 메뉴이면 활성화 시키기
