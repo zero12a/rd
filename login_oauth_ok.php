@@ -100,14 +100,14 @@ $objAuth->setUserAuth($resArr["RTN_DATA"]["AUTH_INFO"]);
 $db = getDbConn($CFG["CFG_DB"]["OS"]);
 
 //인트로 URL가져오기
-$introUrl = getMyGrpIntroUrl();
+//$introUrl = getMyGrpIntroUrl();
 
 //세션부여
 //var_dump($REQ);
 setUserSeq($REQ["USR_SEQ"]);
 setUserId($REQ["USR_ID"]);
 setUserNm($REQ["USR_NM"]);     
-setIntroUrl($introUrl);       
+//setIntroUrl($introUrl);       
 
 //oauth
 setAccessToken($REQ["access_token"]);
@@ -139,7 +139,7 @@ $db->close();unset($objAuth);
 //header("Location : ./bo_main_v2.php")
 ?>
 <script>
-location = "bo_main_v2.php";
+location = "bo_main_v3.php";
 </script>
 <?php
 

@@ -77,6 +77,7 @@ $CFG = require_once("../common/include/incConfig.php");
       <v-app-bar
         app
         clipped-left
+        dense
       >
         <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
         <v-toolbar-title><?=$CFG["CFG_PROJECT_NAME"]?></v-toolbar-title>
@@ -113,7 +114,7 @@ $CFG = require_once("../common/include/incConfig.php");
           <v-flex id="vflex" text-xs-center fill-height>
             <v-tabs
                 dark
-                background-color="teal darken-3"
+                background-color="light-blue darken-2"
                 show-arrows
                 v-on:change="changeTabs"
                 v-model="active_tab"
@@ -158,6 +159,7 @@ new Vue({
         active_tab : null, //0, 1, 2, 3 ~ 숫자 인덱스 순서임
         mytab : [],
         myMenu : [],
+        myNotice : [],
         dark_theme : false,
         CFG_RD_URL_MNU_ROOT : '<?=$CFG["CFG_RD_URL_MNU_ROOT"]?>'
     }),
@@ -167,7 +169,8 @@ new Vue({
     },
     mounted () {
       alog("vue.mounted()...............................start");
-      this.loadTabs();
+      this.loadMenus();
+      this.loadUserInfo();
     },
     methods:{
         changeTheme: function(){
@@ -175,7 +178,8 @@ new Vue({
           this.$vuetify.theme.dark = this.dark_theme;
           return !this.dark_theme;
         },
-        loadTabs: function(){
+        loadMenus: function(){
+          alog("methods.loadTabs()...............................start");          
             var self = this;
 
             $.getJSON( "bo_main_v3_api.php?CTL=getMenu", function() {
@@ -191,6 +195,24 @@ new Vue({
             });
 
         },
+        loadUserInfo: function(){
+            var self = this;
+
+            $.getJSON( "bo_main_v3_api.php?CTL=getUserInfo", function() {
+                alog( "loadUserInfo()......................success" );
+            })
+            .done(function(data) {
+                alog( "loadUserInfo.done()......................success" );
+                alog(data);
+                for(i=0;i<data.intro.length;i++){
+                  self.addTab(data.intro[i].PGMID,data.intro[i].MNU_NM,data.intro[i].URL);
+                }
+            })
+            .fail(function() {
+                alert( "error" );
+            });
+
+        },        
         changeTabs: function(tHref){
             alog("changeTabs().........................start");
             alog(this);
@@ -253,7 +275,7 @@ new Vue({
               //alert(tabContentHeight);
 
               tmp = '<div class="divTab"  id="div-'  + tId + '"';
-              tmp += ' style="overflow:hidden;position:absolute;width:100%;height:' + tabContentHeight + 'px;z-index:1;"><iframe frameborder="0" marginwidth="0" marginheight="0" ';
+              tmp += ' style="background-color:blue;overflow:hidden;position:absolute;width:100%;height:' + tabContentHeight + 'px;z-index:1;"><iframe frameborder="0" marginwidth="0" marginheight="0" ';
               tmp += '    style="border:0px;position:relative;border:none;height:100%;width:100%;border-width:0px;border-color:silver;" ';
               tmp += '    frameborder="0" id="iframe-' + tId + '" src="' + tUrl + '"> ';
               tmp += '  </iframe>';

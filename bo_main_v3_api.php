@@ -24,7 +24,7 @@ $resToken = uniqid();
 $log = getLogger(
     array(
     "LIST_NM"=>"log_CG"
-    , "PGM_ID"=>"BO_MAIN_V2"
+    , "PGM_ID"=>"BO_MAIN_V3"
     , "REQTOKEN" => $reqToken
     , "RESTOKEN" => $resToken
     , "LOG_LEVEL" => Monolog\Logger::DEBUG
@@ -65,7 +65,6 @@ if($CTL == "getMenu"){
             , m2.PGMID as id
             , m.mnu_nm as nm
             , m.url as url
-            , mnu_icon as icon
             from CMN_MNU2 m2
                 left outer join CMN_MNU m on m2.PGMID = m.PGMID
             where MNU1_SEQ = #{MNU1_SEQ} 
@@ -100,16 +99,35 @@ if($CTL == "getMenu"){
     closeDb($db);
 
 }else if($CTL == "getUserInfo"){
-    ?>
-    {
-        "infro":
-            [
-                {id:"tab1", nm:"nm1", url:"demo_webix.php"}
-                ,{id:"tab2", nm:"nm2", url:"demo_webixtab.php"}
-            ],
-        "notice" : []
-    }
-    <?php
+
+    $rtnVal = array();
+
+
+    $db = getDbConn($CFG["CFG_DB"]["OS"]);
+    $sql = "
+        select c.PGMID, c.MNU_SEQ, c.MNU_NM, c.URL
+        from CMN_GRP_USR a
+            join CMN_GRP b on a.GRP_SEQ = b.GRP_SEQ
+            join CMN_MNU c on b.INTRO_PGMID = c.PGMID
+        where a.USR_SEQ = #{USR_SEQ}
+    ";
+
+    $REQ["USR_SEQ"] = getUserSeq(); //incUser.php
+    $sqlMap = getSqlParam($sql,$coltype="i",$REQ);
+    $stmt = getStmt($db,$sqlMap);
+    $arrIntroUrl = getStmtArray($stmt);
+    closeStmt($stmt);
+
+
+    //세션에서 인트로URL 가져오기
+    $rtnVal["intro"] = $arrIntroUrl;
+
+    //알림 목록 가져오기
+    $rtnVal["notice"] = array();
+
+    echo json_encode($rtnVal);
+
+    closeDb($db);
 }else{
     ?>
     {"ctl":"not good"}
