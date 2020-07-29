@@ -108,8 +108,8 @@ new Vue({
   el: '#app',
   vuetify: new Vuetify(),
   data: () => ({
-      id: "2"
-      ,passwd: "3"
+      id: ""
+      ,passwd: ""
       ,g1: {
         user_cd: []
         ,radioGroup: 1
