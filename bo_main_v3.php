@@ -23,6 +23,15 @@ $CFG = require_once("../common/include/incConfig.php");
   <script src="<?=$CFG["CFG_URL_LIBS_ROOT"]?>lib/vuetify2x.min.js"></script>
   <script src="<?=$CFG["CFG_URL_LIBS_ROOT"]?>lib/jquery/jquery-3.5.1.min.js"></script>
 
+  <style>
+    /*
+    우측 스크롤 문제 생기는거 해결
+    https://stackoverflow.com/questions/46522331/scroll-bar-in-the-main-section-of-a-v-app
+    */
+    html{
+      overflow-y: hidden;
+    }
+  </style>
 </head>
 <body>
 
