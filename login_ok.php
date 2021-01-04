@@ -32,7 +32,10 @@ $REQ["F_PASSWD_HASH"] = pwd_hash($REQ["F_PASSWD"],$CFG["CFG_SEC_SALT"]);
 alog("REQ.F_PASSWD_HASH = ". $REQ["F_PASSWD_HASH"]);
 
 //DB연결 정보 생성
-$db = db_obj_open(getDbSvrInfo("DATING"));
+//$db = db_obj_open(getDbSvrInfo("DATING"));
+
+//DB연결 정보 생성
+$db = getDbConn($CFG["CFG_DB"]["OS"]);
 
 $coltype = "s";
 $sql = "
