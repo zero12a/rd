@@ -1,5 +1,5 @@
 <?php
-echo opcache_get_status();
+//echo opcache_get_status();
 
-//phpinfo();
+phpinfo();
 ?>

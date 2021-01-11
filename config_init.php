@@ -24,10 +24,8 @@ $CFG = require_once("../common/include/incConfig.php");
   <script type="text/javascript" src="<?=$CFG["CFG_URL_LIBS_ROOT"]?>lib/lodash.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
-  <script
-			  src="https://code.jquery.com/jquery-3.5.1.min.js"
-			  integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
-			  crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 
 </head>
 <body>
@@ -251,7 +249,7 @@ $CFG = require_once("../common/include/incConfig.php");
                       ></v-text-field>
                     </v-col>
                     <v-col cols="12" sm="2">
-                      <v-btn block>EDIT</v-btn>
+                      <v-btn block @click="btnDbmsEdit">EDIT</v-btn>
                     </v-col>
                   </v-row>
                   <v-data-table
@@ -322,7 +320,7 @@ $CFG = require_once("../common/include/incConfig.php");
                       ></v-text-field>
                     </v-col>
                     <v-col cols="12" sm="2">
-                      <v-btn block>EDIT</v-btn>
+                      <v-btn @click="btnFilestoreEdit" block>EDIT</v-btn>
                     </v-col>
                       
                   </v-row>
@@ -377,6 +375,7 @@ $CFG = require_once("../common/include/incConfig.php");
                     <v-file-input
                     dense
                     multiple
+                    v-model="SQL_FILES"
                     hint="hint text"
                     ></v-file-input>
                 </v-col>
@@ -400,7 +399,7 @@ $CFG = require_once("../common/include/incConfig.php");
 
           <v-btn
             color="primary"
-            @click="e1 = 1"
+            @click="stepEndSave"
           >
             Continue
           </v-btn>
@@ -512,12 +511,79 @@ new Vue({
             , ACL: "42"
           },
         ]
+        , SQL_FILES : []
         , e1: 1
     }
   },
   methods: {
       msg : function(){
           alert(this.CFG_PROJECT_NAME);
+      },
+      stepEndSave: function(t){
+
+          var fd = new FormData();
+          fd.append('SQL_FILES', this.SQL_FILES)
+          axios.post('config_init_api.php',
+                fd, {
+                  headers: {
+                    'Content-Type': 'multipart/form-data'
+                  }
+                }
+          ).then( response => {
+            alog('SUCCESS!!');
+            alog(response.data)
+          })
+          .catch(function () {
+            alert('FAILURE!!');
+          });
+
+      },
+      btnFilestoreEdit: function(t){
+        alog(t);
+        for(i=0;i< this.FILESTORE_LOCAL_DATA.length; i++){
+          alog("i1 = " + i);
+          alog(" old dbid = " + this.FILESTORE_LOCAL_DATA[i].FSID);
+          alog(" new dbid = " + this.FILESTORE_FSID);
+          
+          if(this.FILESTORE_LOCAL_DATA[i].FSID == this.FILESTORE_FSID){
+            this.FILESTORE_LOCAL_DATA[i].FSID = this.FILESTORE_FSID;
+            this.FILESTORE_LOCAL_DATA[i].UPLOADDIR = this.FILESTORE_UPLOADDIR;
+            this.FILESTORE_LOCAL_DATA[i].ACL = this.FILESTORE_ACL;
+          }
+        }
+
+        for(i=0;i< this.FILESTORE_S3_DATA.length; i++){
+          alog("i2 = " + i);
+          alog(" old dbid = " + this.FILESTORE_S3_DATA[i].FSID);
+          alog(" new dbid = " + this.FILESTORE_FSID);
+          
+          if(this.FILESTORE_S3_DATA[i].FSID == this.FILESTORE_FSID){
+            this.FILESTORE_S3_DATA[i].FSID = this.FILESTORE_FSID;
+            this.FILESTORE_S3_DATA[i].CREKEY = this.FILESTORE_CREKEY;
+            this.FILESTORE_S3_DATA[i].CRESECRET = this.FILESTORE_CRESECRET;
+            this.FILESTORE_S3_DATA[i].BUCKET = this.FILESTORE_BUCKET;
+            this.FILESTORE_S3_DATA[i].REGION = this.FILESTORE_REGION;
+            this.FILESTORE_S3_DATA[i].ACL = this.FILESTORE_ACL;
+          }
+        }
+        
+      },
+      btnDbmsEdit: function (t){
+        alog(t);
+        for(i=0;i< this.DBMS_DATA.length; i++){
+          alog("i = " + i);
+          alog(" old dbid = " + this.DBMS_DATA[i].DBID);
+          alog(" new dbid = " + this.DBMS_DBID);
+  
+          if(this.DBMS_DATA[i].DBID == this.DBMS_DBID){
+            this.DBMS_DATA[i].DBID = this.DBMS_DBID;
+            this.DBMS_DATA[i].HOST = this.DBMS_HOST;
+            this.DBMS_DATA[i].PORT = this.DBMS_PORT;
+            this.DBMS_DATA[i].DBNM = this.DBMS_DBNM;
+            this.DBMS_DATA[i].UID = this.DBMS_UID;
+            this.DBMS_DATA[i].PW = this.PW;
+          }
+        }
       },
       dbmsRowClick : function(value) {
         //alert(value);
