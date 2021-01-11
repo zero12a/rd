@@ -6,6 +6,17 @@ header("Pragma:no-cache");
 
 var_dump($_FILES);
 
+
+// Valid file extensions
+$valid_extensions = array("jpg","jpeg","png","pdf");
+
+// File extension
+$extension = pathinfo($filename, PATHINFO_EXTENSION);
+
+// Check extension
+//if(in_array(strtolower($extension),$valid_extensions) ) {
+
+
 if (isset($_FILES)) {
     echo "is set ok";
     $file = $_FILES["SQL_FILES"];
@@ -22,7 +33,7 @@ if (isset($_FILES)) {
     } 
 
 
-    echo $tmp_name;
+    echo "tmp_name = " .  $tmp_name;
 }else{
     echo "not file";
 }
