@@ -522,8 +522,9 @@ new Vue({
       stepEndSave: function(t){
 
           var fd = new FormData();
+          fd.append("test1","1111");
           fd.append('SQL_FILES', this.SQL_FILES);
-          
+
           axios.post('config_init_api.php',
                 fd, {
                   headers: {

@@ -16,6 +16,7 @@ $extension = pathinfo($filename, PATHINFO_EXTENSION);
 // Check extension
 //if(in_array(strtolower($extension),$valid_extensions) ) {
 
+echo "test1 = " . $_POST["test1"];
 
 if (isset($_FILES)) {
     echo "is set ok";
