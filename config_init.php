@@ -397,12 +397,14 @@ $CFG = require_once("../common/include/incConfig.php");
 
           <v-btn
             color="primary"
-            @click="e1 = 3"
+            @click="step2End"
           >
             Continue
           </v-btn>
   
-          <v-btn text>
+          <v-btn text
+          @click="e1 = 1"
+          >
             Cancel
           </v-btn>
         </v-stepper-content>
@@ -431,34 +433,22 @@ $CFG = require_once("../common/include/incConfig.php");
                 </v-btn>
               </v-card-actions>
             </v-card>
-            <v-row align="center" no-gutters style="background-color:red;">
+            <v-row v-for="(item,index) in DBMS_DATA" align="center" no-gutters style="background-color:red;">
                 <v-col cols="12" sm="4" style="background-color:gray;">
-                    <v-subheader v-text="'SQL - Common init file'"></v-subheader>
+                    <v-subheader v-text="'SQL - ' + item.DBID  + ' init file'"></v-subheader>
                 </v-col>
                 <v-col cols="12" sm="8" style="background-color:silver;">
                     <v-file-input
                     dense
                     multiple
                     show-size
-                    v-model="SQL_FILES"
+                    v-model="SQL_FILES[item.DBID]"
                     hint="hint text"
                     ></v-file-input>
                 </v-col>
             </v-row>
             <v-divider></v-divider>
 
-            <v-row align="center" no-gutters style="background-color:red;">
-                <v-col cols="12" sm="4" style="background-color:gray;">
-                    <v-subheader v-text="'SQL - Service init file'"></v-subheader>
-                </v-col>
-                <v-col cols="12" sm="8" style="background-color:silver;">
-                    <v-file-input
-                    dense
-                    multiple
-                    hint="hint text"
-                    ></v-file-input>
-                </v-col>
-            </v-row>
             <v-divider></v-divider>
 
 
@@ -469,7 +459,9 @@ $CFG = require_once("../common/include/incConfig.php");
             Continue
           </v-btn>
   
-          <v-btn text>
+          <v-btn text
+          @click="e1 = 2"
+          >
             Cancel
           </v-btn>
         </v-stepper-content>
@@ -517,15 +509,15 @@ new Vue({
           {
             DBID: "DB1"
             , DRIVER: "MYSQLI"
-            , HOST: "1"
-            , PORT: "2"
-            , DBNM: "3"
-            , UID: "4"
-            , PW: "5"
+            , HOST: "172.17.0.1"
+            , PORT: "3306"
+            , DBNM: "CGPJT2"
+            , UID: "cg"
+            , PW: "cg1234qwe"
           },
           {
             DBID: "DB2"
-            ,DRIVER : "PDO_MYSQL"
+            , DRIVER : "PDO_MYSQL"
             , HOST: "6"
             , PORT: "7"
             , DBNM: "8"
@@ -573,7 +565,7 @@ new Vue({
             , ACL: "private"
           },
         ]
-        , SQL_FILES : []
+        , SQL_FILES : {}
         , e1: 1
     }
   },
@@ -581,21 +573,57 @@ new Vue({
       msg : function(){
           alert(this.CFG_PROJECT_NAME);
       },
+      step2End: function(t){
+        var fd = new FormData();
+          fd.append("PROPERTY",JSON.stringify(this.PROPERTY));
+          fd.append("DBMS_DATA",JSON.stringify(this.DBMS_DATA));
+          fd.append("FILESTORE_DATA",JSON.stringify(this.FILESTORE_DATA));
+          
+          //fd.set("test1","axios");
+          alog(222);
+          axios.post('config_init_api.php?CTL=STEP2_END',
+                fd, {}
+          ).then( response => {
+            alog('SUCCESS!!');
+            alog(response.data);
+
+            if(response.data.RTN_CD != "200"){
+              alert(response.data.RTN_MSG);
+            }
+
+            this.e1 = 3; //step3 으로 이동
+          })
+          .catch(function () {
+            alert('FAILURE!!');
+          });
+
+          
+      },
       stepEndSave: function(t){
 
           var fd = new FormData();
           fd.append("PROPERTY",JSON.stringify(this.PROPERTY));
           fd.append("DBMS_DATA",JSON.stringify(this.DBMS_DATA));
           fd.append("FILESTORE_DATA",JSON.stringify(this.FILESTORE_DATA));
-          //alog(this.SQL_FILES);
+          alog(this.SQL_FILES);
 
-          if(this.SQL_FILES.length > 1){
-            for(var i=0;i<this.SQL_FILES.length;i++){
-              fd.append("SQL_FILES[" + i + "]", this.SQL_FILES[i]);
+          for(var t=0;t<this.DBMS_DATA.length;t++){
+            tDbId = this.DBMS_DATA[t].DBID;
+            alert(tDbId);
+            if(typeof this.SQL_FILES[tDbId] === 'undefined')continue; //파일이 없으면 다음 루프
+            if(this.SQL_FILES[tDbId].length > 1){
+              alog(111);
+              for(var i=0;i<this.SQL_FILES[tDbId].length;i++){
+                alog(222);
+                fd.append("SQL_FILES[" + tDbId + "][" + i + "]", this.SQL_FILES[tDbId][i] );
+              }
+            }else if(this.SQL_FILES[tDbId].length == 1){
+              alog(333);
+              fd.append("SQL_FILES[" + tDbId + "]", this.SQL_FILES[tDbId][0] );
             }
-          }else if(this.SQL_FILES.length == 1){
-            fd.append("SQL_FILES", this.SQL_FILES[0]);
           }
+
+
 
 
           //fd.set("test1","axios");
@@ -608,7 +636,9 @@ new Vue({
                 }
           ).then( response => {
             alog('SUCCESS!!');
-            alog(response.data)
+            alog(response.data);
+
+
           })
           .catch(function () {
             alert('FAILURE!!');
@@ -651,7 +681,7 @@ new Vue({
             this.DBMS_DATA[i].PORT = this.DBMS_PORT;
             this.DBMS_DATA[i].DBNM = this.DBMS_DBNM;
             this.DBMS_DATA[i].UID = this.DBMS_UID;
-            this.DBMS_DATA[i].PW = this.PW;
+            this.DBMS_DATA[i].PW = this.DBMS_PW;
           }
         }
       },
