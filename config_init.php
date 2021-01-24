@@ -193,13 +193,13 @@ $CFG = require_once("../common/include/incConfig.php");
                 <v-col cols="12" sm="8"  style="background-color:silver;">
                     <v-text-field
                     dense
-                    v-model="PROPERTY.LDAP_HOST"
+                    v-model="PROPERTY.CFG_LDAP_HOST"
                     label="IP or DOMAIN"
                     hint="hint text"
                     counter="25"
                     ></v-text-field>
                     <v-text-field
-                    v-model="PROPERTY.LDAP_PORT"
+                    v-model="PROPERTY.CFG_LDAP_PORT"
                     dense
                     label="PORT"
                     hint="hint text"
@@ -475,6 +475,10 @@ $CFG = require_once("../common/include/incConfig.php");
 new Vue({
   el: '#app',
   vuetify: new Vuetify(),
+  mounted() { 
+    console.log("Parent mounted");
+    this.step1Start();
+  },
   data () {
     return {
         PROPERTY : { 
@@ -486,8 +490,8 @@ new Vue({
           , ADMIN_PWD: "5"
           , ADMIN_ID: "6"
           , ADMIN_PWD_CONFIRM: "7"
-          , LDAP_HOST: "8"
-          , LDAP_PORT: "9"
+          , CFG_LDAP_HOST: "8"
+          , CFG_DAP_PORT: "9"
         }
         , DBMS_DBID: ""
         , DBMS_DRIVER: ""
@@ -505,26 +509,7 @@ new Vue({
           {text: 'uid', value: 'UID', sortable: true},
           {text: 'pw *', value: 'PW', sortable: true}
         ]
-        , DBMS_DATA: [
-          {
-            DBID: "DB1"
-            , DRIVER: "MYSQLI"
-            , HOST: "172.17.0.1"
-            , PORT: "3306"
-            , DBNM: "CGPJT2"
-            , UID: "cg"
-            , PW: "cg1234qwe"
-          },
-          {
-            DBID: "DB2"
-            , DRIVER : "PDO_MYSQL"
-            , HOST: "6"
-            , PORT: "7"
-            , DBNM: "8"
-            , UID: "9"
-            , PW: "0"
-          }
-        ]
+        , DBMS_DATA: []
         , FILESTORE_STOREID: ""
         , FILESTORE_STORETYPE: ""
         , FILESTORE_UPLOADDIR: ""
@@ -543,28 +528,7 @@ new Vue({
           {text: 'BUCKET', value: 'BUCKET', sortable: true},
           {text: 'ACL', value: 'ACL', sortable: true},
         ]
-        , FILESTORE_DATA: [
-          {
-            STOREID: "FS1"
-            , STORETYPE: "LOCAL"
-            , UPLOADDIR: "/data/www/up"
-            , CREKEY: ""
-            , CRESECRET: ""
-            , REGION: ""
-            , BUCKET: ""
-            , ACL: "public"
-          },
-          {
-            STOREID: "FS2"
-            , STORETYPE: "S3"
-            , UPLOADDIR: ""
-            , CREKEY: "aaa"
-            , CRESECRET: "bbb"
-            , REGION: "ccc"
-            , BUCKET: "ddd"
-            , ACL: "private"
-          },
-        ]
+        , FILESTORE_DATA: []
         , SQL_FILES : {}
         , e1: 1
     }
@@ -572,6 +536,40 @@ new Vue({
   methods: {
       msg : function(){
           alert(this.CFG_PROJECT_NAME);
+      },
+      step1Start: function(t){
+        var fd = new FormData();        
+        //fd.set("test1","axios");
+        alog(222);
+        axios.post('config_init_api.php?CTL=STEP1_START',
+              fd, {}
+        ).then( response => {
+          alog('SUCCESS!!');
+          alog(response.data);
+
+          if(response.data.RTN_CD != "200"){
+            alert(response.data.RTN_MSG);
+          }else{
+            var firstJson = JSON.parse(response.data.RTN_MSG);
+            //초기값 설정
+            this.PROPERTY.CFG_PROJECT_NAME = firstJson.CFG_PROJECT_NAME;
+            this.PROPERTY.CFG_SEC_KEY = firstJson.CFG_SEC_KEY;
+            this.PROPERTY.CFG_SEC_IV = firstJson.CFG_SEC_IV;
+            this.PROPERTY.CFG_SEC_SALT = firstJson.CFG_SEC_SALT;
+            this.PROPERTY.CFG_URL_LIBS_ROOT = firstJson.CFG_URL_LIBS_ROOT;
+            this.PROPERTY.CFG_LDAP_HOST = firstJson.CFG_LDAP_HOST;
+            this.PROPERTY.CFG_LDAP_PORT = firstJson.CFG_LDAP_PORT;
+
+            alog(firstJson.CFG_DB);
+            this.DBMS_DATA = firstJson.CFG_DB;
+            this.FILESTORE_DATA = firstJson.CFG_FILESTORE;
+          }
+
+        })
+        .catch(function () {
+          alert('FAILURE!!');
+        });
+
       },
       step2End: function(t){
         var fd = new FormData();
