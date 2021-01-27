@@ -212,7 +212,7 @@ $CFG = require_once("../common/include/incConfig.php");
 
           <v-btn
             color="primary"
-            @click="e1 = 2;msg();"
+            @click="step1End"
           >
             Continue
           </v-btn>
@@ -571,6 +571,13 @@ new Vue({
         });
 
       },
+      step1End: function(t){
+        if (this.PROPERTY.ADMIN_PWD != this.PROPERTY.ADMIN_PWD_CONFIRM ){
+          alert("비밀번호와 확인비밀번호가 일치하지 않습니다.");
+        }else{
+          this.e1 = 2; //step2로 이동
+        }
+      },
       step2End: function(t){
         var fd = new FormData();
           fd.append("PROPERTY",JSON.stringify(this.PROPERTY));
@@ -607,7 +614,7 @@ new Vue({
 
           for(var t=0;t<this.DBMS_DATA.length;t++){
             tDbId = this.DBMS_DATA[t].DBID;
-            alert(tDbId);
+            //alert(tDbId);
             if(typeof this.SQL_FILES[tDbId] === 'undefined')continue; //파일이 없으면 다음 루프
             if(this.SQL_FILES[tDbId].length > 1){
               alog(111);
@@ -635,6 +642,11 @@ new Vue({
           ).then( response => {
             alog('SUCCESS!!');
             alog(response.data);
+            if(response.data.RTN_CD != "200"){
+              alert(response.data.RTN_MSG);
+            }else{
+              alert("Success saved.")
+            }
 
 
           })

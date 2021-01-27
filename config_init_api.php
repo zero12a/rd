@@ -42,12 +42,12 @@ if($ctl == "STEP1_START"){
 	$jsonString = $redisClient->get($CFG["CONFIG_NM"]);
 	$redisClient->quit();
 
-    if(strlen($jsonString) > 0){
+    if(strlen($jsonString) > 0 ){
         JsonMsg("500","100","이미 CONFIG 설정이 완료되었습니다. Config length is " . strlen($jsonString));
     }else{
         JsonMsg("200","100",getFirstConfigData());
     }
-    echo 44444;
+    //echo 44444;
 
 }else if($ctl == "STEP2_END"){
     $REQ["DBMS_DATA"] = json_decode($_POST["DBMS_DATA"],true);
@@ -77,7 +77,8 @@ if($ctl == "STEP1_START"){
     //10 DB초기화 등록
     //20 초기파라미터 정보 불러오기
     //30 저장할 파라미터 정보 생성
-    //40 redis서버에 반영
+    //35 redist서버에서 기존 config 백업
+    //40 redis서버에 신규 config 반영
     //50 redis변경 알람(타 컨테이너에도 반영되게) 
     //60 admin사용자를 최고관리자 그룹에 넣기
 
@@ -88,7 +89,7 @@ if($ctl == "STEP1_START"){
 
     //10 DB초기화 등록
     if (isset($_FILES)) {
-        echo "<br>is set ok";
+        //echo "<br>is set ok";
         $file = $_FILES["SQL_FILES"];
         //var_dump($file);
         //exit;
@@ -98,84 +99,137 @@ if($ctl == "STEP1_START"){
 
         for($t=0;$t<count($REQ["DBMS_DATA"]);$t++){
             $tDbId = $REQ["DBMS_DATA"][$t]["DBID"];
-            echo "<BR> $t DBID : " . $tDbId;
+            //echo "<BR> $t DBID : " . $tDbId;
 
             // File extension
             $name = $file["name"][$tDbId];
-            $extension = pathinfo($name, PATHINFO_EXTENSION);
 
-            echo "<BR> 파일이름 : " . $name;
-            echo "<BR> 확장자 : " . strtolower($extension);
-            // Check extension
-            if(!in_array(strtolower($extension),$valid_extensions) ) {
-                echo $extension . "는 업로드 허용된 확장자가 아닙니다.";
-                exit;
-            }
+            //첨부파일이 존재하면 아래 진행
+            if(strlen($name)>3){
+                $extension = pathinfo($name, PATHINFO_EXTENSION);
 
-
-            $error = $file["error"][$tDbId];
-
-            $type = $file["type"][$tDbId];
-            $size = $file["size"][$tDbId];
-            $tmp_name = $file["tmp_name"][$tDbId];
-            
-            if ( $error > 0 ) {
-                echo "<br>Error: " . $error . "<br>";
-            } 
-
-            //파일 열어서 변수에 담기
-            $myfile = fopen($tmp_name, "r") or die("Unable to open file!");
-            $sqlQuery = fread($myfile,filesize($tmp_name));
-            fclose($myfile);
+                //echo "<BR> 파일이름 : " . $name;
+                //echo "<BR> 확장자 : " . strtolower($extension);
+                // Check extension
+                if(!in_array(strtolower($extension),$valid_extensions) ) {
+                    JsonMsg("500","410", $extension . "는 업로드 허용된 확장자가 아닙니다.");
+                    exit;
+                }
 
 
-            //DB연결 정보 생성
-            $tDbmsObj = $REQ["DBMS_DATA"][$t];
-            $tDbmsObj["ID"] = $tDbmsObj["UID"];
-            try{
-                $db = getDbConnPlain($tDbmsObj);
-            } catch(Exception $e) {
-                echo "<br>db 연결시 오류가 발생했습니다." . $e->getMessage();
+                $error = $file["error"][$tDbId];
+
+                $type = $file["type"][$tDbId];
+                $size = $file["size"][$tDbId];
+                $tmp_name = $file["tmp_name"][$tDbId];
+                
+                if ( $error > 0 ) {
+                    JsonMsg("500","420","File upload error: " . $error);
+                } 
+
+                //파일 열어서 변수에 담기
+                $myfile = fopen($tmp_name, "r") or die("Unable to open file!");
+                $sqlQuery = fread($myfile,filesize($tmp_name));
+                fclose($myfile);
+
+
+                //DB연결 정보 생성
+                $tDbmsObj = $REQ["DBMS_DATA"][$t];
+                $tDbmsObj["ID"] = $tDbmsObj["UID"];
+                try{
+                    $db = getDbConnPlain($tDbmsObj);
+                } catch(Exception $e) {
+                    closeDb($db);
+                    JsonMsg("500","430","db연결시 오류가 발생했습니다." . $e->getMessage());
+                }
+
+                if ($db->multi_query($sqlQuery)) {
+                    //echo "<br>성공했습니다.";
+                }else{
+                    //echo "<br>실패했습니다.";
+                    closeDb($db);
+                    JsonMsg("500","440","db multi_query error." . $e->getMessage());
+                }
                 closeDb($db);
-                exit;
-            }
-
-            if ($db->multi_query($sqlQuery)) {
-                echo "<br>성공했습니다.";
-            }else{
-                echo "<br>실패했습니다.";
-            }
-            closeDb($db);
-
+            }//파일 이름이 있을때만 진행
         }
 
 
 
-        echo "<br>tmp_name = " .  $tmp_name;
+        //echo "<br>tmp_name = " .  $tmp_name;
     }else{
-        echo "<br>not file";
+        //echo "<br>not file";
     }
-    echo "<br>test1 = " . $_POST["test1"];
+    //echo "<br>test1 = " . $_POST["test1"];
 
 
     //20 초기파라미터 정보 불러오기
     $firstCfgArray = json_decode(getFirstConfigData(),true);
+    $REQ["PROPERTY"] = json_decode($_POST["PROPERTY"],true);
+    $REQ["DBMS_DATA"] = json_decode($_POST["DBMS_DATA"],true);
+    //var_dump($REQ["DBMS_DATA"]);
+
+    $tDbmsData = array();
+    $tDbmsDataPlain = array();
+    for($i=0;$i<count($REQ["DBMS_DATA"]);$i++){
+        $tDbmsData[$REQ["DBMS_DATA"][$i]["DBID"]] = array(
+            "DRIVER" => $REQ["DBMS_DATA"][$i]["DRIVER"],
+            "HOST" => $REQ["DBMS_DATA"][$i]["HOST"],
+            "PORT" => $REQ["DBMS_DATA"][$i]["PORT"],
+            "DBNM" => $REQ["DBMS_DATA"][$i]["DBNM"],
+            "ID" => $REQ["DBMS_DATA"][$i]["UID"],
+            "PW" => aesEncrypt($REQ["DBMS_DATA"][$i]["PW"],$REQ["PROPERTY"]["CFG_SEC_KEY"],$REQ["PROPERTY"]["CFG_SEC_IV"])
+        );
+
+        $tDbmsDataPlain[$REQ["DBMS_DATA"][$i]["DBID"]] = array(
+            "DRIVER" => $REQ["DBMS_DATA"][$i]["DRIVER"],
+            "HOST" => $REQ["DBMS_DATA"][$i]["HOST"],
+            "PORT" => $REQ["DBMS_DATA"][$i]["PORT"],
+            "DBNM" => $REQ["DBMS_DATA"][$i]["DBNM"],
+            "ID" => $REQ["DBMS_DATA"][$i]["UID"],
+            "PW" => $REQ["DBMS_DATA"][$i]["PW"]
+        );
+
+    }
+    //var_dump($tDbmsData);
+
+    
+    $REQ["FILESTORE_DATA"] = json_decode($_POST["FILESTORE_DATA"],true);
+    $tFilestoreData = array();
+
+    for($i=0;$i<count($REQ["FILESTORE_DATA"]);$i++){
+        $tFilestoreData[$REQ["FILESTORE_DATA"][$i]["STOREID"]] = array(
+            "STORETYPE" => $REQ["FILESTORE_DATA"][$i]["STORETYPE"],
+            "UPLOADDIR" => $REQ["FILESTORE_DATA"][$i]["UPLOADDIR"],
+            "READURL" => $REQ["FILESTORE_DATA"][$i]["READURL"],
+            "CREKEY" => aesEncrypt($REQ["FILESTORE_DATA"][$i]["CREKEY"],$REQ["PROPERTY"]["CFG_SEC_KEY"],$REQ["PROPERTY"]["CFG_SEC_IV"]),
+            "CRESECRET" => aesEncrypt($REQ["FILESTORE_DATA"][$i]["CRESECRET"],$REQ["PROPERTY"]["CFG_SEC_KEY"],$REQ["PROPERTY"]["CFG_SEC_IV"]),
+            "REGION" => $REQ["FILESTORE_DATA"][$i]["REGION"],
+            "BUCKET" => $REQ["FILESTORE_DATA"][$i]["BUCKET"],
+            "ACL" => $REQ["FILESTORE_DATA"][$i]["ACL"]
+        );
+    }    
+    //var_dump($tFilestoreData);
+
 
     //30 저장할 파라미터 정보 생성
-    $saveCfgArray = array();
-    $saveCfgArray["CFG_PROJECT_NAME"] = $REQ["CFG_PROJECT_NAME"];
-    $saveCfgArray["CFG_SEC_KEY"] = $REQ["CFG_SEC_KEY"];
-    $saveCfgArray["CFG_SEC_IV"] = $REQ["CFG_SEC_IV"];
-    $saveCfgArray["CFG_SEC_SALT"] = $REQ["CFG_SEC_SALT"];
-    $saveCfgArray["CFG_URL_LIBS_ROOT"] = $REQ["CFG_URL_LIBS_ROOT"];
-    $saveCfgArray["ADMIN_PWD"] = $REQ["ADMIN_PWD"];
-    $saveCfgArray["ADMIN_ID"] = $REQ["ADMIN_ID"];
-    $saveCfgArray["CFG_LDAP_HOST"] = $REQ["CFG_LDAP_HOST"];
-    $saveCfgArray["CFG_DAP_PORT"] = $REQ["CFG_DAP_PORT"];
-    $saveCfgArray["CFG_DB"] = json_decode($REQ["CFG_DB"],true);
-    $saveCfgArray["CFG_FILESTORE"] = json_decode($REQ["CFG_FILESTORE"],true);
-    
-    //40 redis서버에 반영
+    $saveCfgArray = $firstCfgArray;
+    $saveCfgArray["CFG_PROJECT_NAME"]   = $REQ["PROPERTY"]["CFG_PROJECT_NAME"];
+    $saveCfgArray["CFG_SEC_KEY"]        = $REQ["PROPERTY"]["CFG_SEC_KEY"];
+    $saveCfgArray["CFG_SEC_IV"]         = $REQ["PROPERTY"]["CFG_SEC_IV"];
+    $saveCfgArray["CFG_SEC_SALT"]       = $REQ["PROPERTY"]["CFG_SEC_SALT"];
+    $saveCfgArray["CFG_URL_LIBS_ROOT"]  = $REQ["PROPERTY"]["CFG_URL_LIBS_ROOT"];
+    //$saveCfgArray["ADMIN_PWD"]          = $REQ["PROPERTY"]["ADMIN_PWD"];
+    //$saveCfgArray["ADMIN_ID"]           = $REQ["PROPERTY"]["ADMIN_ID"];
+    $saveCfgArray["CFG_LDAP_HOST"]      = $REQ["PROPERTY"]["CFG_LDAP_HOST"];
+    $saveCfgArray["CFG_LDAP_PORT"]      = $REQ["PROPERTY"]["CFG_LDAP_PORT"];
+
+    $saveCfgArray["CFG_DB"] = $tDbmsData;
+    $saveCfgArray["CFG_FILESTORE"] = $tFilestoreData;
+
+    //echo PHP_EOL . "333";
+
+    //35 redist서버에서 기존 config 백업
 	if($CFG["REDIS_PASSWD"] != ""){
 		$redisClient = new Predis\Client(
 			array(
@@ -194,6 +248,10 @@ if($ctl == "STEP1_START"){
 				'timeout' => 1
 			));
     }    
+    $oldCfgJsonStr = $redisClient->get($CFG["CONFIG_NM"]);
+	$redisClient->set($CFG["CONFIG_NM"] . "." . date("Ymd"), $oldCfgJsonStr );
+
+    //40 redis서버에 신규 config 반영
 	$redisClient->set($CFG["CONFIG_NM"],json_encode($saveCfgArray));
 
 
@@ -201,23 +259,40 @@ if($ctl == "STEP1_START"){
     $redisClient->publish("config." . $CFG["CONFIG_NM"],$CFG["CONFIG_NM"] . " change redis config data.");
 	$redisClient->quit();
 
+    
+    //echo PHP_EOL . "444";
+
     //60 admin사용자를 최고관리자 그룹에 넣기(공통DB)
-    $db = getDbConn($saveCfgArray["CFG_DB"]["CMN"]);
+    try{
+        $db = getDbConnPlain($tDbmsDataPlain["COMMON"]);
+    } catch(Exception $e) {
+        closeDb($db);
+        JsonMsg("500","450","db 연결시 오류가 발생했습니다." . $e->getMessage());
+        exit;
+    }
+
+
 
     //61사용자에 넣기]
-    $REQ["USR_ID"] = $REQ["ADMIN_ID"];
-    $REQ["USR_PWD"] = pwd_hash($REQ["ADMIN_PWD"],$saveCfgArray["CFG_SEC_SALT"] );
+    $REQ["USR_ID"] = $REQ["PROPERTY"]["ADMIN_ID"];
+    $REQ["USR_PWD"] = pwd_hash($REQ["PROPERTY"]["ADMIN_PWD"],$saveCfgArray["CFG_SEC_SALT"] );
     $sql = "insert into CMN_USR (USR_ID, USR_NM, USE_YN, USR_PWD, ADD_DT, ADD_ID) values (
         #{USR_ID}, '관리자', 'Y', #{USR_PWD}, date_format(sysdate(),'%Y%m%d%H%i%s'), 0
     )";
-    $sqlMap = getSqlParam($sql,$coltype="",$REQ);
+    $sqlMap = getSqlParam($sql,$coltype="ss",$REQ);
     $stmt = getStmt($db,$sqlMap);
-    if(!$stmt->execute())JsonMsg("500","100","stmt 실행 실패" . $stmt->errno . " -> " . $stmt->error);
+
+    //var_dump($stmt);
+
+    if(!$stmt->execute())JsonMsg("500","460","stmt 실행 실패" . $stmt->errno . " -> " . $stmt->error);
     if($stmt instanceof PDOStatement){
         $REQ["USR_SEQ"] = $db->lastInsertId(); //insert문인 경우 insert id받기                            
     }else{
         $REQ["USR_SEQ"] = $db->insert_id; //insert문인 경우 insert id받기
     }
+
+    
+    //echo PHP_EOL . "555";
 
     //62그룹사용자에 넣기
     //GRP_SEQ이 1이면 관리자그룹
@@ -225,13 +300,15 @@ if($ctl == "STEP1_START"){
         1, #{USR_SEQ}, date_format(sysdate(),'%Y%m%d%H%i%s') , 0
     )
     ";
-    $sqlMap = getSqlParam($sql,$coltype="",$REQ);
+    $sqlMap = getSqlParam($sql,$coltype="s",$REQ);
     $stmt = getStmt($db,$sqlMap);
-    if(!$stmt->execute())JsonMsg("500","100","stmt 실행 실패" . $stmt->errno . " -> " . $stmt->error);
+    if(!$stmt->execute())JsonMsg("500","470","stmt 실행 실패" . $stmt->errno . " -> " . $stmt->error);
 
     closeStmt($stmt);
+    closeDb($db);
 
-
+    //최종 성공 리턴
+    JsonMsg("200","100","Success save.");
 }
 
 //최초 config_init 호출시 사용
@@ -290,21 +367,21 @@ function getFirstConfigData(){
         ],
         "CFG_DB": [ 
             {
-                "DBID": "CG",
-                "DRIVER": "",
+                "DBID": "COMMON",
+                "DRIVER": "MYSQLI",
                 "HOST": "172.17.0.1",
                 "PORT": "3306",
-                "DBNM": "CG",
-                "UID": "",
+                "DBNM": "RD_COMMON",
+                "UID": "cg",
                 "PW": ""
             },
             {
-                "DBID": "DATING",
-                "DRIVER": "",
+                "DBID": "SERVICE",
+                "DRIVER": "MYSQLI",
                 "HOST": "172.17.0.1",
                 "PORT": "3306",
-                "DBNM": "DATING",
-                "UID": "",
+                "DBNM": "RD_SERVICE",
+                "UID": "cg",
                 "PW": ""
             }
         ],
