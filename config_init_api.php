@@ -5,6 +5,7 @@ header("Pragma:no-cache");
 
 $CFG = require_once("../common/include/incConfig.php");
 
+//var_dump($CFG);
 
 require_once("../common/include/incDB.php");
 require_once("../common/include/incSec.php");
@@ -45,7 +46,16 @@ if($ctl == "STEP1_START"){
     if(strlen($jsonString) > 0 ){
         JsonMsg("500","100","이미 CONFIG 설정이 완료되었습니다. Config length is " . strlen($jsonString));
     }else{
-        JsonMsg("200","100",getFirstConfigData());
+
+        //스탭 토큰 생성
+        $firstCfgStr = getFirstConfigData();
+        $firstCfgArray = json_decode($firstCfgStr,true);
+        $firstCfgArray["STEP_TOKEN"] = getRndVal(10);
+
+        //세션에 토큰 기록
+        $_SESSION["STEP_TOKEN"] = $firstCfgArray["STEP_TOKEN"];
+
+        JsonMsg("200","100", json_encode($firstCfgArray));
     }
     //echo 44444;
 
@@ -74,13 +84,22 @@ if($ctl == "STEP1_START"){
 
 }else{
     //최종 단계
+    //00 스텝토큰이 맞는지 확인
     //10 DB초기화 등록
     //20 초기파라미터 정보 불러오기
     //30 저장할 파라미터 정보 생성
     //35 redist서버에서 기존 config 백업
     //40 redis서버에 신규 config 반영
     //50 redis변경 알람(타 컨테이너에도 반영되게) 
+    //55 로컬 캐쉬에게 반영되게처리
     //60 admin사용자를 최고관리자 그룹에 넣기
+    //70 리턴하기 전에 세션토큰 지우기(재호출 방지)
+
+    //00 스텝토큰이 맞는지 확인
+    $stepToken = $_POST["STEP_TOKEN"];
+    if( $stepToken != $_SESSION["STEP_TOKEN"] ){
+        JsonMsg("500","100", "한번 설정을 저장한 경우 재요청할 수 없습니다.(STEP_TOKEN)");
+    }
 
 
     // Valid file extensions
@@ -227,6 +246,11 @@ if($ctl == "STEP1_START"){
     $saveCfgArray["CFG_DB"] = $tDbmsData;
     $saveCfgArray["CFG_FILESTORE"] = $tFilestoreData;
 
+    //레디스 정보도 저장하기
+    $saveCfgArray["REDIS_HOST"] = $CFG["REDIS_HOST"];
+    $saveCfgArray["REDIS_PORT"] = $CFG["REDIS_PORT"];
+    $saveCfgArray["REDIS_PASSWD"] = $CFG["REDIS_PASSWD"];
+
     //echo PHP_EOL . "333";
 
     //35 redist서버에서 기존 config 백업
@@ -259,7 +283,8 @@ if($ctl == "STEP1_START"){
     $redisClient->publish("config." . $CFG["CONFIG_NM"],$CFG["CONFIG_NM"] . " change redis config data.");
 	$redisClient->quit();
 
-    
+    //55 로컬 캐쉬에게 반영되게처리
+    apcu_store($CFG["CONFIG_NM"], json_encode($saveCfgArray));
     //echo PHP_EOL . "444";
 
     //60 admin사용자를 최고관리자 그룹에 넣기(공통DB)
@@ -307,8 +332,11 @@ if($ctl == "STEP1_START"){
     closeStmt($stmt);
     closeDb($db);
 
+    //70 리턴하기 전에 세션토큰 지우기(재호출 방지)
+    unset( $_SESSION["STEP_TOKEN"] );
+
     //최종 성공 리턴
-    JsonMsg("200","100","Success save.");
+    JsonMsg("200","100","Success init save.");
 }
 
 //최초 config_init 호출시 사용

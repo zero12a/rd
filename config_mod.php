@@ -7,12 +7,11 @@ $CFG = require_once("../common/include/incConfig.php");
 
 //호출하면 캐쉬 초기화
 apcu_store($CFG["CONFIG_NM"], null);
-
 ?>
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Config init</title>
+    <title>Config modify</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
 
   <!--css-->
@@ -36,33 +35,6 @@ apcu_store($CFG["CONFIG_NM"], null);
 
 <div id="app">
   <v-app id="inspire">
-    <v-stepper v-model="e1">
-      <v-stepper-header>
-        <v-stepper-step
-          :complete="e1 > 1"
-          step="1"
-        >
-        기본설정 of step 1
-        </v-stepper-step>
-  
-        <v-divider></v-divider>
-  
-        <v-stepper-step
-          :complete="e1 > 2"
-          step="2"
-        >
-        DB/파일 스토어 of step 2
-        </v-stepper-step>
-  
-        <v-divider></v-divider>
-  
-        <v-stepper-step step="3">
-        초기DB세팅 of step 3
-        </v-stepper-step>
-      </v-stepper-header>
-  
-      <v-stepper-items>
-        <v-stepper-content step="1">
             <!--
             ####
             #### step 1
@@ -78,8 +50,13 @@ apcu_store($CFG["CONFIG_NM"], null);
               REDIS_PORT : <?=$CFG["REDIS_PORT"]?><br>
               REDIS_PASSWD : <?=($CFG["REDIS_PASSWD"] != "")?"Yes":"No";?><br>
               CONFIG_NM : <?=$CFG["CONFIG_NM"]?><br>
-              <br>
-              * 저장시 암호화 : ADMIN PWD
+              <BR>
+              STORETYPE은 LOCAL 또는 S3이 가능하고<BR>
+              S3는 AWS의 S3서비스로 CREKEY, CRESECRET, REGION, BUCKET, ACL이 필수 항목이고<BR>
+              LOCAL은 UPLOADDIR, ACL이 필수 항목임<BR>
+              ACL은 private, public-read, public-read-write가 가능함.<BR>
+              <BR>
+                * 저장시 암호화 : ADMIN PWD, DBMS PW, AWS CREKEY, AWS CRESECRET
               </v-card-text>
             </v-card>
             <v-divider></v-divider>
@@ -153,42 +130,7 @@ apcu_store($CFG["CONFIG_NM"], null);
                 </v-col>
             </v-row>
             <v-divider></v-divider>
-            <v-row align="center" no-gutters style="background-color:blue;">
-                <v-col cols="12" sm="4"  style="background-color:gray;">
-                    <v-subheader v-text="'ADMIN ID'"></v-subheader>
-                </v-col>
-                <v-col cols="12" sm="8"  style="background-color:silver;">
-                    <v-text-field
-                    v-model="PROPERTY.ADMIN_ID"
-                    dense
-                    hint="hint text"
-                    counter="25"
-                    ></v-text-field>
-                </v-col>
-            </v-row>
-            <v-divider></v-divider>
-            <v-row align="center" no-gutters style="background-color:blue;">
-                <v-col cols="12" sm="4"  style="background-color:gray;">
-                    <v-subheader v-text="'ADMIN PWD *'"></v-subheader>
-                </v-col>
-                <v-col cols="12" sm="8"  style="background-color:silver;">
-                    <v-text-field
-                    v-model="PROPERTY.ADMIN_PWD"
-                    dense
-                    label="password"
-                    hint="hint text"
-                    counter="25"
-                    ></v-text-field>
-                    <v-text-field
-                    v-model="PROPERTY.ADMIN_PWD_CONFIRM"
-                    dense
-                    label="password confirm"
-                    hint="hint text"
-                    counter="25"
-                    ></v-text-field>
-                </v-col>
-            </v-row>
-            <v-divider></v-divider>
+
             <v-row align="center" no-gutters style="background-color:blue;">
                 <v-col cols="12" sm="4"  style="background-color:gray;">
                     <v-subheader v-text="'LDAP AUTH(OPTION)'"></v-subheader>
@@ -213,40 +155,12 @@ apcu_store($CFG["CONFIG_NM"], null);
             <v-divider></v-divider>
 
 
-          <v-btn
-            color="primary"
-            @click="step1End"
-          >
-            Continue
-          </v-btn>
-  
-          <v-btn text>
-            Cancel
-          </v-btn>
-        </v-stepper-content>
-  
-        <v-stepper-content step="2">
   
             <!--
             ####
             #### step 2
             ####
             -->
-            <v-card
-            class="mx-auto"
-            elevation="2"
-            color="blue lighten-5 mb-2"
-            >
-              <v-card-text>
-              STORETYPE은 LOCAL 또는 S3이 가능하고<BR>
-              S3는 AWS의 S3서비스로 CREKEY, CRESECRET, REGION, BUCKET, ACL이 필수 항목이고<BR>
-              LOCAL은 UPLOADDIR, ACL이 필수 항목임<BR>
-              ACL은 private, public-read, public-read-write가 가능함.<BR>
-              <BR>
-              * 저장시 암호화 : DBMS PW, AWS CREKEY, AWS CRESECRET
-              </v-card-text>
-            </v-card>
-            <v-divider></v-divider>
             <v-row align="center" no-gutters style="background-color:blue;">
                 <v-col cols="12" sm="4"  style="background-color:gray;">
                     <v-subheader v-text="'DBMS'"></v-subheader>
@@ -395,81 +309,19 @@ apcu_store($CFG["CONFIG_NM"], null);
                   ></v-data-table>
                 </v-col>
             </v-row>
-            <v-divider></v-divider>
-
+            <v-divider></v-divider>s
 
           <v-btn
             color="primary"
-            @click="step2End"
+            @click="step1EndSave"
           >
             Continue
           </v-btn>
   
-          <v-btn text
-          @click="e1 = 1"
-          >
-            Cancel
-          </v-btn>
-        </v-stepper-content>
-  
-        <v-stepper-content step="3">
-            <!--
-            ####
-            #### step 3
-            ####
-            -->
-            <v-card
-            class="mx-auto"
-            elevation="2"
-            color="blue lighten-5 mb-2"
-            >
-              <v-card-text>
-              SQL FILE is download at GitHub Link.
-              </v-card-text>
-              <v-card-actions>
-                <v-btn
-                  text
-                  color="blue darken-4"
-                  @click="reveal = true"
-                >
-                  Download
-                </v-btn>
-              </v-card-actions>
-            </v-card>
-            <v-row v-for="(item,index) in DBMS_DATA" align="center" no-gutters style="background-color:red;">
-                <v-col cols="12" sm="4" style="background-color:gray;">
-                    <v-subheader v-text="'SQL - ' + item.DBID  + ' init file'"></v-subheader>
-                </v-col>
-                <v-col cols="12" sm="8" style="background-color:silver;">
-                    <v-file-input
-                    dense
-                    multiple
-                    show-size
-                    v-model="SQL_FILES[item.DBID]"
-                    hint="hint text"
-                    ></v-file-input>
-                </v-col>
-            </v-row>
-            <v-divider></v-divider>
-
-            <v-divider></v-divider>
 
 
-          <v-btn
-            color="primary"
-            @click="stepEndSave"
-          >
-            Continue
-          </v-btn>
-  
-          <v-btn text
-          @click="e1 = 2"
-          >
-            Cancel
-          </v-btn>
-        </v-stepper-content>
-      </v-stepper-items>
-    </v-stepper>
+
+
   </v-app>
 </div>
 
@@ -490,13 +342,10 @@ new Vue({
           , CFG_SEC_IV: "3"
           , CFG_SEC_SALT: "4"
           , CFG_URL_LIBS_ROOT: "http://localhost:8070/"
-          , ADMIN_PWD: "5"
-          , ADMIN_ID: "6"
           , ADMIN_PWD_CONFIRM: "7"
           , CFG_LDAP_HOST: "8"
           , CFG_DAP_PORT: "9"
         }
-        , STEP_TOKEN: ""
         , DBMS_DBID: ""
         , DBMS_DRIVER: ""
         , DBMS_HOST: ""
@@ -533,7 +382,6 @@ new Vue({
           {text: 'ACL', value: 'ACL', sortable: true},
         ]
         , FILESTORE_DATA: []
-        , SQL_FILES : {}
         , e1: 1
     }
   },
@@ -545,7 +393,7 @@ new Vue({
         var fd = new FormData();        
         //fd.set("test1","axios");
         alog(222);
-        axios.post('config_init_api.php?CTL=STEP1_START',
+        axios.post('config_mod_api.php?CTL=STEP1_START',
               fd, {}
         ).then( response => {
           alog('SUCCESS!!');
@@ -564,10 +412,48 @@ new Vue({
             this.PROPERTY.CFG_LDAP_HOST = firstJson.CFG_LDAP_HOST;
             this.PROPERTY.CFG_LDAP_PORT = firstJson.CFG_LDAP_PORT;
 
-            alog(firstJson.CFG_DB);
-            this.DBMS_DATA = firstJson.CFG_DB;
-            this.FILESTORE_DATA = firstJson.CFG_FILESTORE;
-            this.STEP_TOKEN = firstJson.STEP_TOKEN;
+            //alog(firstJson.CFG_DB);
+            i = 0;
+            for(key in firstJson.CFG_DB) {
+
+                //alert('key:' + key + ' / ' + 'value:' + firstJson.CFG_DB[key]);
+                //array[i] = {}와 같이 직접 업데이트는 vue갱신이 안되고, 배열을 반드시 push로 업데이트 해야함.
+                this.DBMS_DATA.push({
+                    "DBID": key
+                    ,"DRIVER": firstJson.CFG_DB[key].DRIVER
+                    ,"HOST": firstJson.CFG_DB[key].HOST
+                    ,"PORT": firstJson.CFG_DB[key].PORT
+                    ,"DBNM": firstJson.CFG_DB[key].DBNM
+                    ,"UID": firstJson.CFG_DB[key].ID
+                    ,"PW": firstJson.CFG_DB[key].PW
+                });
+                //alog(this.DBMS_DATA[i]);
+                
+                i++;
+            }
+
+            i = 0;
+            for(key in firstJson.CFG_FILESTORE) {
+
+                //alert('key:' + key + ' / ' + 'value:' + firstJson.CFG_DB[key]);
+                //array[i] = {}와 같이 직접 업데이트는 vue갱신이 안되고, 배열을 반드시 push로 업데이트 해야함.
+                this.FILESTORE_DATA.push({
+                    "STOREID": key
+                    ,"STORETYPE": firstJson.CFG_FILESTORE[key].STORETYPE
+                    ,"UPLOADDIR": firstJson.CFG_FILESTORE[key].UPLOADDIR
+                    ,"READURL": firstJson.CFG_FILESTORE[key].READURL
+                    ,"CREKEY": firstJson.CFG_FILESTORE[key].CREKEY
+                    ,"CRESECRET": firstJson.CFG_FILESTORE[key].CRESECRET
+                    ,"REGION": firstJson.CFG_FILESTORE[key].REGION
+                    ,"BUCKET": firstJson.CFG_FILESTORE[key].BUCKET
+                    ,"ACL": firstJson.CFG_FILESTORE[key].ACL
+                });
+                //alog(this.DBMS_DATA[i]);
+                
+                i++;
+            }
+
+
           }
 
         })
@@ -576,73 +462,19 @@ new Vue({
         });
 
       },
-      step1End: function(t){
-        if (this.PROPERTY.ADMIN_PWD != this.PROPERTY.ADMIN_PWD_CONFIRM ){
-          alert("비밀번호와 확인비밀번호가 일치하지 않습니다.");
-        }else{
-          this.e1 = 2; //step2로 이동
-        }
-      },
-      step2End: function(t){
-        var fd = new FormData();
-          fd.append("PROPERTY",JSON.stringify(this.PROPERTY));
-          fd.append("DBMS_DATA",JSON.stringify(this.DBMS_DATA));
-          fd.append("FILESTORE_DATA",JSON.stringify(this.FILESTORE_DATA));
-          
-          //fd.set("test1","axios");
-          alog(222);
-          axios.post('config_init_api.php?CTL=STEP2_END',
-                fd, {}
-          ).then( response => {
-            alog('SUCCESS!!');
-            alog(response.data);
-
-            if(response.data.RTN_CD != "200"){
-              alert(response.data.RTN_MSG);
-            }
-
-            this.e1 = 3; //step3 으로 이동
-          })
-          .catch(function () {
-            alert('FAILURE!!');
-          });
-
-          
-      },
-      stepEndSave: function(t){
+      step1EndSave: function(t){
 
           var fd = new FormData();
           fd.append("PROPERTY",JSON.stringify(this.PROPERTY));
           fd.append("DBMS_DATA",JSON.stringify(this.DBMS_DATA));
           fd.append("FILESTORE_DATA",JSON.stringify(this.FILESTORE_DATA));
-          fd.append("STEP_TOKEN",this.STEP_TOKEN);
-          alog(this.SQL_FILES);
-
-          for(var t=0;t<this.DBMS_DATA.length;t++){
-            tDbId = this.DBMS_DATA[t].DBID;
-            //alert(tDbId);
-            if(typeof this.SQL_FILES[tDbId] === 'undefined')continue; //파일이 없으면 다음 루프
-            if(this.SQL_FILES[tDbId].length > 1){
-              alog(111);
-              for(var i=0;i<this.SQL_FILES[tDbId].length;i++){
-                alog(222);
-                fd.append("SQL_FILES[" + tDbId + "][" + i + "]", this.SQL_FILES[tDbId][i] );
-              }
-            }else if(this.SQL_FILES[tDbId].length == 1){
-              alog(333);
-              fd.append("SQL_FILES[" + tDbId + "]", this.SQL_FILES[tDbId][0] );
-            }
-          }
-
-
-
 
           //fd.set("test1","axios");
           alog(222);
-          axios.post('config_init_api.php',
+          axios.post('config_mod_api.php?CTL=STEP1_END',
                 fd, {
                   headers: {
-                    'Content-Type': 'multipart/form-data'
+                    'Content-Type': 'application/x-www-form-urlencoded'
                   }
                 }
           ).then( response => {
