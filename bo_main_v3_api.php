@@ -33,7 +33,7 @@ $log = getLogger(
 
 if($CTL == "getMenu"){
 
-    $db = getDbConn($CFG["CFG_DB"]["OS"]);
+    $db = getDbConn($CFG["CFG_DB"]["RDCOMMON"]);
     $sql = "select 
         mnu1_seq as mnu1_seq
         , m1.FOLDER_YN
@@ -103,7 +103,7 @@ if($CTL == "getMenu"){
     $rtnVal = array();
 
 
-    $db = getDbConn($CFG["CFG_DB"]["OS"]);
+    $db = getDbConn($CFG["CFG_DB"]["RDCOMMON"]);
     $sql = "
         select c.PGMID, c.MNU_SEQ, c.MNU_NM, c.URL
         from CMN_GRP_USR a

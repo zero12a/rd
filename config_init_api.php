@@ -301,9 +301,14 @@ if($ctl == "STEP1_START"){
     //61사용자에 넣기]
     $REQ["USR_ID"] = $REQ["PROPERTY"]["ADMIN_ID"];
     $REQ["USR_PWD"] = pwd_hash($REQ["PROPERTY"]["ADMIN_PWD"],$saveCfgArray["CFG_SEC_SALT"] );
-    $sql = "insert into CMN_USR (USR_ID, USR_NM, USE_YN, USR_PWD, ADD_DT, ADD_ID) values (
-        #{USR_ID}, '관리자', 'Y', #{USR_PWD}, date_format(sysdate(),'%Y%m%d%H%i%s'), 0
-    )";
+    $sql = "insert into CMN_USR (
+            USR_ID, USR_NM, USE_YN, USR_PWD, LDAP_LOGIN_YN
+            , ADD_DT, ADD_ID
+        ) values (
+            #{USR_ID}, '관리자', 'Y', #{USR_PWD}, 'N'
+            , date_format(sysdate(),'%Y%m%d%H%i%s'), 0
+        )
+    ";
     $sqlMap = getSqlParam($sql,$coltype="ss",$REQ);
     $stmt = getStmt($db,$sqlMap);
 
