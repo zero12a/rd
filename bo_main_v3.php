@@ -93,6 +93,8 @@ $CFG = require_once("../common/include/incConfig.php");
 
         <v-spacer></v-spacer>
 
+
+
         <v-switch 
         class="pt-5"
         v-model="dark_theme" @change="changeTheme" label="Dark theme"></v-switch>
@@ -104,9 +106,14 @@ $CFG = require_once("../common/include/incConfig.php");
           >
           <v-icon>mdi-bell</v-icon>
         </v-btn>        
-        <v-btn icon @click="location='logout.php'">
-          <v-icon>mdi-location-exit</v-icon>
-        </v-btn>
+        <v-chip class="pl-4 pr-1">
+          {{usr_navi_msg}}
+          <v-btn icon @click="location='logout.php'">
+            <v-icon>mdi-location-exit</v-icon>
+          </v-btn>
+        </v-chip>
+
+
       </v-app-bar>
   
       <v-main>
@@ -170,6 +177,7 @@ new Vue({
         myMenu : [],
         myNotice : [],
         dark_theme : false,
+        usr_navi_msg : "",
         CFG_RD_URL_MNU_ROOT : '<?=$CFG["CFG_RD_URL_MNU_ROOT"]?>'
     }),
 
@@ -216,6 +224,8 @@ new Vue({
                 for(i=0;i<data.intro.length;i++){
                   self.addTab(data.intro[i].PGMID,data.intro[i].MNU_NM,data.intro[i].URL);
                 }
+
+                self.usr_navi_msg = data.UID + "님 환영합니다.";
             })
             .fail(function() {
                 alert( "error" );

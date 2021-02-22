@@ -149,6 +149,8 @@ if($CTL == "getMenu"){
     $arrIntroUrl = getStmtArray($stmt);
     closeStmt($stmt);
 
+    //사용자ID 가져오기
+    $rtnVal["UID"] = getUserId();
 
     //세션에서 인트로URL 가져오기
     $rtnVal["intro"] = $arrIntroUrl;
