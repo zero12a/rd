@@ -231,7 +231,7 @@ new Vue({
         },          
         addTab: function(tId,tNm,tUrl2){
             alog("addTab().........................start");
-
+            if(tUrl2 == null || tUrl2 == "")return;
             var tUrl = this.CFG_RD_URL_MNU_ROOT + tUrl2;
 
             tJson = {id:tId,name:tNm,link:tUrl,isdisplay:""};

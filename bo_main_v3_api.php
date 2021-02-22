@@ -13,6 +13,10 @@ require_once("../common/include/incDB.php");
 require_once("../common/include/incUser.php");
 require_once("../common/include/incSec.php");    
 require_once("../common/include/incRequest.php");
+require_once("../common/include/incAuth.php");
+
+
+
 
 //로그인 검사
 require_once("../common/include/incLoginCheck.php");//로그인 검사
@@ -32,6 +36,13 @@ $log = getLogger(
 );
 
 if($CTL == "getMenu"){
+
+    //권한 정보 세션에서 조회하기
+    $authObj= new authObject();
+    $authArray = $authObj->getUserAuth();
+    //print_r($authArray);
+
+
 
     $db = getDbConn($CFG["CFG_DB"]["RDCOMMON"]);
     $sql = "select 
@@ -54,11 +65,23 @@ if($CTL == "getMenu"){
     $sqlMap = getSqlParam($sql,$coltype="",$REQ);
     $stmt = getStmt($db,$sqlMap);
     $mnu1Info = getStmtArray($stmt);
+    //print_r($mnu1Info);
     closeStmt($stmt);
 
-
+    //권한이 있는 메뉴만 인가배열에 추가하기
+    $mnu1InfoAuthed = array();
     for($i=0;$i<count($mnu1Info);$i++){
-        if($mnu1Info[$i]["FOLDER_YN"] == "Y"){
+        if( $mnu1Info[$i]["FOLDER_YN"] == "Y"){
+            array_push($mnu1InfoAuthed,$mnu1Info[$i]);
+        }else if( $mnu1Info[$i]["FOLDER_YN"] == "N" && count($authArray[$mnu1Info[$i]["id"]]) > 0 ){
+            array_push($mnu1InfoAuthed,$mnu1Info[$i]);
+        } 
+    }
+
+    for($i=0;$i<count($mnu1InfoAuthed);$i++){
+
+        $mnu2InfoAuthed = array();
+        if($mnu1InfoAuthed[$i]["FOLDER_YN"] == "Y"){
             //echo $i . PHP_EOL;
             $sql = "select 
             mnu2_seq as mnu2_seq
@@ -72,29 +95,37 @@ if($CTL == "getMenu"){
             ";
 
             $REQ = array();
-            alog("mnu1_seq = " . $mnu1Info[$i]["mnu1_seq"]);
-            $REQ["MNU1_SEQ"] = $mnu1Info[$i]["mnu1_seq"];
+            alog("mnu1_seq = " . $mnu1InfoAuthed[$i]["mnu1_seq"]);
+            $REQ["MNU1_SEQ"] = $mnu1InfoAuthed[$i]["mnu1_seq"];
 
             $sqlMap = getSqlParam($sql,$coltype="i",$REQ);
             $stmt = getStmt($db,$sqlMap);
             $mnu2Info = getStmtArray($stmt);
             closeStmt($stmt);
             if(sizeof($mnu2Info) > 0){
-                $mnu1Info[$i]["submenus"] = $mnu2Info;
-                //$mnu1Info[$i]["submenu_cnt"] = sizeof($mnu2Info);
-            }else{
-                $mnu1Info[$i]["submenus"] = array();
-                //$mnu1Info[$i]["submenu_cnt"] = "0";
+
+                //권한이 있는 메뉴만 인가배열에 추가하기
+
+                for($t=0;$t<count($mnu2Info);$t++){
+                    if( count($authArray[$mnu2Info[$t]["id"]]) > 0 ){
+                        array_push($mnu2InfoAuthed,$mnu2Info[$t]);
+                    } 
+                }
             }
+
+        }
+
+        if( count($mnu2InfoAuthed) > 0 ){
+            $mnu1InfoAuthed[$i]["submenus"] = $mnu2InfoAuthed;
+            //$mnu1Info[$i]["submenu_cnt"] = sizeof($mnu2Info);
         }else{
-            $mnu1Info[$i]["submenus"] = array();
+            $mnu1InfoAuthed[$i]["submenus"] = array();
             //$mnu1Info[$i]["submenu_cnt"] = "0";
         }
-     
 
     }
 
-    echo json_encode($mnu1Info);
+    echo json_encode($mnu1InfoAuthed);
 
     closeDb($db);
 
