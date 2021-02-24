@@ -296,7 +296,7 @@ new Vue({
               tmp = '<div class="divTab"  id="div-'  + tId + '"';
               tmp += ' style="overflow:hidden;position:absolute;width:100%;height:' + tabContentHeight + 'px;z-index:1;"><iframe frameborder="0" marginwidth="0" marginheight="0" ';
               tmp += '    style="border:0px;position:relative;border:none;height:100%;width:100%;border-width:0px;border-color:silver;" ';
-              tmp += '    frameborder="0" id="iframe-' + tId + '" src="' + tUrl + '"> ';
+              tmp += '    scrolling="yes" frameborder="0" id="iframe-' + tId + '" src="' + tUrl + '"> ';
               tmp += '  </iframe>';
               tmp += '</div>';
 
