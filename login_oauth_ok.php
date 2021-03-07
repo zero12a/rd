@@ -94,6 +94,8 @@ try{
 $REQ["USR_SEQ"] = $resArr["RTN_DATA"]["USER_INFO"]["USR_SEQ"];
 $REQ["USR_ID"] = $resArr["RTN_DATA"]["USER_INFO"]["USR_ID"];
 $REQ["USR_NM"] = $resArr["RTN_DATA"]["USER_INFO"]["USR_NM"];
+$REQ["TEAMCD"] = $resArr["RTN_DATA"]["USER_INFO"]["TEAMCD"];
+$REQ["TEAMNM"] = $resArr["RTN_DATA"]["USER_INFO"]["TEAMNM"];
 
 
 //마지막 로그인세션 기록용(중복로그인 방지)
@@ -114,6 +116,8 @@ $db = getDbConn($CFG["CFG_DB"]["RDCOMMON"]);
 setUserSeq($REQ["USR_SEQ"]);
 setUserId($REQ["USR_ID"]);
 setUserNm($REQ["USR_NM"]);     
+setTeamCd($REQ["TEAMCD"]);    
+setTeamNm($REQ["TEAMNM"]);    
 //setIntroUrl($introUrl);       
 
 //oauth
