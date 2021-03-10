@@ -5,6 +5,7 @@ header("Pragma:no-cache");
 
 $CFG = require_once("../common/include/incConfig.php");
 
+
 require_once("../common/include/incDB.php");
 require_once("../common/include/incSec.php");
 require_once("../common/include/incUtil.php");
@@ -13,8 +14,19 @@ require_once("../common/include/incAuth.php");
 require_once("../common/include/incRequest.php");
 require_once('../common/include/incLdap.php');//CG LDAP
 
-
 require_once('./login_class.php');//CG LDAP
+require_once($CFG["CFG_LIBS_VENDOR"]);
+
+$log = getLogger(
+	array(
+	"LIST_NM"=>"log_CG"
+	, "PGM_ID"=>"login_ok.php"
+	, "REQTOKEN" => $reqToken
+	, "RESTOKEN" => $resToken
+	, "LOG_LEVEL" => Monolog\Logger::INFO
+	)
+);
+
 
 //마지막 로그인 세션id기록용
 $objAuth = new authObject();	
@@ -67,6 +79,8 @@ if($row = $result->fetch_array(MYSQLI_ASSOC))
         //RESPONSE 하기
         JsonMsg("200","220","해당 계정은 잠겨 있습니다. (" . $row["LOCK_LIMIT_DT"] . " 까지)");
     }else if($row["LDAP_LOGIN_YN"] == "Y" && strlen($CFG["CFG_LDAP_HOST"] . "") > 0){ //LDAP_LOGIN_YN
+        alog("ldap login.");
+
         //LDAP 로그인 검사
         $ldap = new ldapClass();
         $conObj = $ldap->connect($CFG["CFG_LDAP_HOST"]);
@@ -81,6 +95,7 @@ if($row = $result->fetch_array(MYSQLI_ASSOC))
             $userLdapMap = $ldap->getUserInfo($CFG["CFG_LDAP_HOST"]);
 
             //팀 정보는 신규/재로그인시 모두 반영
+            $REQ["USR_SEQ"] = $row["USR_SEQ"];
             $REQ["USR_ID"] = $REQ["F_EMAIL"];
             $REQ["USR_NM"] = $userLdapMap["givenname"];
             $REQ["TEAMNM"] = $userLdapMap["department"];
@@ -91,9 +106,36 @@ if($row = $result->fetch_array(MYSQLI_ASSOC))
             //로그인 로그
             $REQ["SUCCESS_YN"] = "Y";
             $REQ["RESPONSE_MSG"] = "(LDAP)ID EXIST, PW EQUAL."; 	
-            $REQ["USR_SEQ"] = $row["USR_SEQ"];
-            $REQ["USR_ID"] = $REQ["F_EMAIL"];
             $objLogin->saveLoginLog($REQ);
+    
+            //마지막 로그인세션 기록용(중복로그인 방지)
+            $objAuth->setLastSession($REQ["USR_SEQ"],session_id());
+    
+            //권한정보 받아오기
+            $arrAuth = $objLogin->getUserAuthArray($REQ);
+    
+            //var_dump($arrAuth);
+            $objAuth->setUserAuth($arrAuth);
+    
+            //로그정보
+            $REQ["AUTH_JSON"] = json_encode($arrAuth);
+            $LoginSeq = $objLogin->saveLoginLog($REQ);
+    
+            //인트로 URL가져오기
+            $introUrl = $objLogin->getMyGrpIntroUrl($REQ);
+    
+            //세션부여
+            setUserSeq($REQ["USR_SEQ"]);
+            setUserId($REQ["USR_ID"]);
+            setUserNm($REQ["USR_NM"]);     
+            setIntroUrl($introUrl);             
+            setLoginSeq($LoginSeq);     
+    
+            //객체 해제
+            unset($objAuth);unset($objLogin);
+
+            //RESPONSE 하기
+            JsonMsg("200","200","로그인에 성공했습니다.");
 
         }else{
             //로그인 실패
@@ -110,6 +152,8 @@ if($row = $result->fetch_array(MYSQLI_ASSOC))
             $REQ["USR_SEQ"] = $row["USR_SEQ"];
             $REQ["USR_ID"] = $REQ["F_EMAIL"];
             $objLogin->saveLoginLog($REQ);
+
+            JsonMsg("200","210","이메일(ID) 혹은 비밀번호가 일치하지 않습니다.(ldap)");
         }
 
     }else if($row["USR_PWD"] == $REQ["F_PASSWD_HASH"]){
@@ -131,11 +175,37 @@ if($row = $result->fetch_array(MYSQLI_ASSOC))
            $objLogin->pwClearFailCnt($REQ);
         }
 
+        //마지막 로그인세션 기록용(중복로그인 방지)
+        $objAuth->setLastSession($REQ["USR_SEQ"],session_id());
+
+        //권한정보 받아오기
+        $REQ["REMOTE_ADDR"] = $_SERVER["REMOTE_ADDR"];
+        $arrAuth = $objLogin->getUserAuthArray($REQ);
+
+        //var_dump($arrAuth);
+        $objAuth->setUserAuth($arrAuth);
+
+        //로그정보
+        $REQ["AUTH_JSON"] = json_encode($arrAuth);
+        $LoginSeq = $objLogin->saveLoginLog($REQ);
+
+        //인트로 URL가져오기
+        $introUrl = $objLogin->getMyGrpIntroUrl($REQ);
+
+        //세션부여
+        setUserSeq($REQ["USR_SEQ"]);
+        setUserId($REQ["USR_ID"]);
+        setUserNm($REQ["USR_NM"]);     
+        setIntroUrl($introUrl);             
+        setLoginSeq($LoginSeq);     
+
+
+
         //객체 해제
-        unset($objAuth);
+        unset($objAuth);unset($objLogin);
 
         //RESPONSE 하기
-        JsonMsg("200","100","로그인에 성공했습니다.");
+        JsonMsg("200","200","로그인에 성공했습니다.");
     }else{
         //LDAP유저가 아닌 일반유저 pw가 틀렸을때
         $REQ["PW_ERR_CNT"] = $row["PW_ERR_CNT"];
@@ -181,11 +251,34 @@ if($row = $result->fetch_array(MYSQLI_ASSOC))
 
             $REQ["USR_SEQ"] = $objLogin->ldapLoginSuccessUserAdd($REQ);
 
+            //권한정보 받아오기
+            $arrAuth = $objLogin->getUserAuthArray($REQ);
+            //var_dump($arrAuth);
+            $objAuth->setUserAuth($arrAuth);
             //로그정보
+            $REQ["AUTH_JSON"] = json_encode($arrAuth);
+
+            //로그정보(AUTH_JSON도 남음)
             $REQ["SUCCESS_YN"] = "Y";
             $REQ["RESPONSE_MSG"] = "(LDAP) ID EXIST, NO LOCK, PW EQUAL."; 
             $REQ["USR_ID"] = $REQ["F_EMAIL"];
             $objLogin->saveLoginLog($REQ);
+
+            //마지막 로그인세션 기록용(중복로그인 방지)
+            $objAuth->setLastSession($REQ["USR_SEQ"],session_id());
+
+            //인트로 URL가져오기
+            $introUrl = $objLogin->getMyGrpIntroUrl($REQ);
+
+            //세션부여
+            setUserSeq($REQ["USR_SEQ"]);
+            setUserId($REQ["USR_ID"]);
+            setUserNm($REQ["USR_NM"]);     
+            setIntroUrl($introUrl);             
+            setLoginSeq($LoginSeq);     
+
+            //객체 해제
+            unset($objAuth);unset($objLogin);
 
             //로그인 성공
             JsonMsg("200","100","로그인에 성공했습니다.");

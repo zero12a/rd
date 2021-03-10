@@ -24,28 +24,6 @@ class loginObject
     function setAuth(&$objAuth,&$objLogin,$REQ){
         alog("setAuth().....................start");
 
-        //마지막 로그인세션 기록용(중복로그인 방지)
-        $objAuth->setLastSession($REQ["USR_SEQ"],session_id());
-
-        //권한정보 받아오기
-        $arrAuth = $objLogin->getUserAuthArray($REQ);
-        //var_dump($arrAuth);
-        $objAuth->setUserAuth($arrAuth);
-
-        //로그정보
-        $REQ["AUTH_JSON"] = json_encode($arrAuth);
-        $LoginSeq = $objLogin->saveLoginLog($REQ);
-
-        //인트로 URL가져오기
-        $introUrl = $objLogin->getMyGrpIntroUrl($REQ);
-
-
-        //세션부여
-        setUserSeq($REQ["USR_SEQ"]);
-        setUserId($REQ["USR_ID"]);
-        setUserNm($REQ["USR_NM"]);     
-        setIntroUrl($introUrl);             
-        setLoginSeq($LoginSeq);     
 
         alog("setAuth().....................end");
     }
@@ -75,10 +53,17 @@ class loginObject
     function getUserAuthArray($REQ){
         alog("getUserAuthArray().....................start");
         //global $db,$REQ;
-    
-        $coltype = "is";
         $sql = "
-            select b.PGMID, b.AUTH_ID
+        select
+        *
+        from
+        (
+            /* default auth */
+            select PGMID, AUTH_ID
+            from CMN_DEFAULT_AUTH
+            union
+            /* group auth */
+            select b.PGMID as PGMID, b.AUTH_ID as AUTH_ID
             from CMN_GRP_USR a
                 join CMN_GRP_AUTH b on a.GRP_SEQ = b.GRP_SEQ
                 join CMN_MNU c on b.PGMID = c.PGMID
@@ -86,9 +71,26 @@ class loginObject
             and c.PGMTYPE IN (
                     select PGMTYPE from CMN_IP where ALLOW_IP = #{REMOTE_ADDR} or ALLOW_IP = '0.0.0.0'
                 )
-            order by b.PGMID, b.AUTH_ID
+            union
+            /* team auth */
+            select a2.PGMID as PGMID, a2.AUTH_ID as AUTH_ID
+            from CMN_TEAM_AUTH a2
+                join CMN_MNU b2 on a2.PGMID = b2.PGMID
+            where a2.TEAM_SEQ = 
+                (
+                        select TEAM_SEQ from CMN_TEAM c2 
+                            join CMN_USR d2 on c2.TEAMCD = d2.TEAMCD and d2.USR_SEQ = #{USR_SEQ} 
+                        where d2.TEAMCD is not null and d2.TEAMCD <> ''
+                )
+            and b2.PGMTYPE IN (
+                    select PGMTYPE from CMN_IP where ALLOW_IP = #{REMOTE_ADDR} or ALLOW_IP = '0.0.0.0'
+                )
+        ) uniondata
+        order by PGMID, AUTH_ID
         ";
-        
+        $coltype = "isis";
+
+
         $stmt = makeStmt($this->db,$sql,$coltype,$REQ);
         
         if(!$stmt)JsonMsg("500","300","SQL makeStmt 실패 했습니다.");
@@ -220,16 +222,16 @@ class loginObject
     function ldapLoginSuccessUserMod($REQ){
         alog("ldapLoginSuccessUserMod().....................start");
 
-        //이미 등록된 사용자 인지 확인하기
+        //기존사용자 로그인 성공시 비번오류 및 잠금해제 초기화 
         $sql = "update CMN_USR set
                 USR_NM = #{USR_NM}, PHONE = #{PHONE}, TEAMCD = #{TEAMCD}, TEAMNM = #{TEAMNM}, EMAIL = #{EMAIL}
                 , PW_ERR_CNT = 0, LOCK_LIMIT_DT = null, LOCK_LAST_DT = null
                 , MOD_DT = date_format(sysdate(),'%Y%m%d%H%i%s'), MOD_ID = 0
             where USR_SEQ = #{USR_SEQ}
         ";
-        $coltype = "sssss ssss";
+        $coltype = "sssss i";
         
-        $sqlMap = getSqlParam($sql,$coltype,$req);
+        $sqlMap = getSqlParam($sql,$coltype,$REQ);
         $stmt = getStmt($this->db,$sqlMap);
         if(!$stmt->execute())JsonMsg("500","102","(Save usr error) stmt 실행 실패 " .  $stmt->error);
 

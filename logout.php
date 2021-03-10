@@ -11,6 +11,6 @@ require_once("../common/include/incUser.php");
 
 logOut();
 
-header('Location: login_oauth.php?from=logout');
+header('Location: login.php?from=logout');
 
 ?>
