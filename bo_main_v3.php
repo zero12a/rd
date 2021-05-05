@@ -101,7 +101,8 @@ $CFG = require_once("../common/include/incConfig.php");
         <v-btn icon>
           <v-badge
             color="green"
-            content="6"
+            :content="msg_cnt"
+            :value="msg_cnt"
             overlap
           >
           <v-icon>mdi-bell</v-icon>
@@ -178,6 +179,7 @@ new Vue({
         myNotice : [],
         dark_theme : false,
         usr_navi_msg : "",
+        msg_cnt : 0,
         CFG_RD_URL_MNU_ROOT : '<?=$CFG["CFG_RD_URL_MNU_ROOT"]?>'
     }),
 
@@ -226,6 +228,7 @@ new Vue({
                 }
 
                 self.usr_navi_msg = data.UID + "님 환영합니다.";
+                self.msg_cnt = data.msg_cnt;
             })
             .fail(function() {
                 alert( "error" );

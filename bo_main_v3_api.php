@@ -136,15 +136,16 @@ if($CTL == "getMenu"){
 
     $db = getDbConn($CFG["CFG_DB"]["RDCOMMON"]);
     $sql = "
-        select c.PGMID, c.MNU_SEQ, c.MNU_NM, c.URL
+        select c.PGMID, c.MNU_SEQ, c.MNU_NM, c.URL, d.MSG_CNT
         from CMN_GRP_USR a
             join CMN_GRP b on a.GRP_SEQ = b.GRP_SEQ
             join CMN_MNU c on b.INTRO_PGMID = c.PGMID
+            join ( select USR_SEQ, count(MSG_BOX_SEQ) as MSG_CNT from CMN_MSG_BOX where USR_SEQ = #{USR_SEQ} and READ_DT is null ) d on a.USR_SEQ = d.USR_SEQ
         where a.USR_SEQ = #{USR_SEQ}
     ";
 
     $REQ["USR_SEQ"] = getUserSeq(); //incUser.php
-    $sqlMap = getSqlParam($sql,$coltype="i",$REQ);
+    $sqlMap = getSqlParam($sql,$coltype="ii",$REQ);
     $stmt = getStmt($db,$sqlMap);
     $arrIntroUrl = getStmtArray($stmt);
     closeStmt($stmt);
@@ -156,7 +157,7 @@ if($CTL == "getMenu"){
     $rtnVal["intro"] = $arrIntroUrl;
 
     //알림 목록 가져오기
-    $rtnVal["notice"] = array();
+    $rtnVal["msg_cnt"] = $arrIntroUrl[0]["MSG_CNT"];
 
     echo json_encode($rtnVal);
 
