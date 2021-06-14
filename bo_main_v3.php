@@ -148,8 +148,8 @@ $CFG = require_once("../common/include/incConfig.php");
                 </v-tab>
             </v-tabs>
         
-            <div id="tabContent" class="divTab" ref="refTabContent"
-             style="overflow:hidden;"></div>
+            <div id="tabContent" class="divTab" ref="refTabContent" 
+             style="overflow:hidden;height:calc(100% - 48px)"></div>
 
 
             </v-flex>
@@ -303,7 +303,7 @@ new Vue({
               //alert(tabContentHeight);
 
               tmp = '<div class="divTab"  id="div-'  + tId + '"';
-              tmp += ' style="overflow:hidden;position:absolute;width:100%;height:' + tabContentHeight + 'px;z-index:1;"><iframe frameborder="0" marginwidth="0" marginheight="0" ';
+              tmp += ' style="overflow:hidden;position:absolute;width:100%;height:calc(100% - 48px);z-index:1;"><iframe frameborder="0" marginwidth="0" marginheight="0" ';
               tmp += '    style="border:0px;position:relative;border:none;height:100%;width:100%;border-width:0px;border-color:silver;" ';
               tmp += '    scrolling="yes" frameborder="0" id="iframe-' + tId + '" src="' + tUrl + '"> ';
               tmp += '  </iframe>';
@@ -365,19 +365,11 @@ function alog(t){
 
 $( window ).resize( function() {
   alog("window.resize()......................start");
-  // do somthing
-  var vflexHeight = $("#vflex").height() - 48;
-
-  $(".divTab").css("height",vflexHeight);
 
 });
 $( document ).ready(function() {
   alog("document.ready()......................start");
 
-  var vflexHeight= $("#vflex").height() - 48;
-
-  
-  $(".divTab").css("height",vflexHeight);
 });
 
 </script>
