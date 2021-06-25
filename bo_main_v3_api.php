@@ -25,7 +25,7 @@ require_once("../common/include/incLoginCheck.php");//로그인 검사
 $reqToken = reqGetString("TOKEN",37);
 $CTL = reqGetString("CTL",20);
 $resToken = uniqid();
-$log = getLogger(
+$log = getLoggerStdout(
     array(
     "LIST_NM"=>"log_CG"
     , "PGM_ID"=>"BO_MAIN_V3"

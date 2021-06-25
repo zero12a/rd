@@ -17,7 +17,7 @@ require_once('../common/include/incLdap.php');//CG LDAP
 require_once('./login_class.php');//CG LDAP
 require_once($CFG["CFG_LIBS_VENDOR"]);
 
-$log = getLogger(
+$log = getLoggerStdout(
 	array(
 	"LIST_NM"=>"log_CG"
 	, "PGM_ID"=>"login_ok.php"
