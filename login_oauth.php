@@ -5,6 +5,7 @@ header("Pragma:no-cache");
 
 
 $CFG = require_once("../common/include/incConfig.php");	
+
 ?>
 <!DOCTYPE html>
 <html>

@@ -143,7 +143,7 @@ $LoginSeq = saveLoginLog($REQ);
 setLoginSeq($LoginSeq);     
 
 //객체 해제
-$db->close();unset($objAuth);
+closeDb($db);unset($objAuth);
 
 //메인 페이지로 이동
 //ob_start();
@@ -169,7 +169,10 @@ function getMyGrpIntroUrl(){
         where a.USR_SEQ = #{USR_SEQ}
     ";
     
-    $stmt = makeStmt($db,$sql,$coltype,$REQ);
+    //$stmt = makeStmt($db,$sql,$coltype,$REQ);
+    $objSqlParam = getSqlParam($sql,$coltype,$REQ);
+    $stmt = getStmt($db,$objSqlParam);
+
     
     if(!$stmt)JsonMsg("500","300","SQL makeStmt 실패 했습니다.");
     
@@ -200,7 +203,10 @@ function saveLoginLog($REQ){
         ) 
     ";
     
-    $stmt = makeStmt($db,$sql,$coltype,$REQ);
+    //$stmt = makeStmt($db,$sql,$coltype,$REQ);
+    $objSqlParam = getSqlParam($sql,$coltype,$REQ);
+    $stmt = getStmt($db,$objSqlParam);
+
     
     if(!$stmt)JsonMsg("500","301","SQL makeStmt 생성 실패 했습니다.");
     
