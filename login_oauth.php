@@ -136,7 +136,7 @@ new Vue({
       },
       goLogin: function(){
           
-        var login_url = "http://?=$CFG["CFG_OAUTH_DOMAIN"]?>:18052/o.s/os2ctl.php";
+        var login_url = "http://<?=$CFG["CFG_OAUTH_DOMAIN"]?>:18052/o.s/os2ctl.php";
 
         //post param nm : client_id, client_secret, username, password
         var client_id = "svcfront";
